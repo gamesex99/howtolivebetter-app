@@ -267,258 +267,88 @@
   <script>
     // ========== 精選真實條目（可之後自行擴充） ==========
     const ENTRIES = [
-      {
-        id: "02-22",
-        chapter: "02-不要慢慢死",
-        title: "每天吃一小把堅果",
-        say: "常吃堅果的人，同期死亡的概率比不吃的人低約兩成。一周吃一次就能看出差別。",
-        cost: "每天 28 克，一年約兩三百元。順手就吃。",
-        benefit: "總死亡率降低約 20%（每周 7 次以上）",
-        evidence: "A",
-        money: "少",
-        time: "少",
-        will: "否",
-        stages: ["early", "mid", "senior"],
-        tags: []
-      },
-      {
-        id: "02-low-sodium",
-        chapter: "02-不要慢慢死",
-        title: "把家裡的食鹽換成低鈉鹽（鉀鹽）",
-        say: "兩萬人的隨機試驗裡，換成低鈉鹽的人五年內死亡概率低約 12%，中風低約 14%。",
-        cost: "每袋貴幾元，買的時候順手換。",
-        benefit: "總死亡率 ↓12%，中風 ↓14%",
-        evidence: "A",
-        money: "少",
-        time: "少",
-        will: "否",
-        stages: ["early", "mid", "senior"],
-        tags: []
-      },
-      {
-        id: "01-smoke",
-        chapter: "01-不要早死",
-        title: "戒煙（或從不開始抽）",
-        say: "戒煙是性價比極高的長壽行為。越早戒，收益越大。",
-        cost: "戒煙藥或門診有成本，但長期省煙錢。",
-        benefit: "大幅降低肺癌、心血管病與總死亡率",
-        evidence: "A",
-        money: "少",
-        time: "中",
-        will: "是",
-        stages: ["early", "mid", "senior"],
-        tags: []
-      },
-      {
-        id: "03-sleep",
-        chapter: "03-不要浪費精力",
-        title: "固定睡眠時間，優先保證 7 小時以上",
-        say: "睡眠不足會直接影響判斷力、情緒和長期健康。",
-        cost: "不花錢，但要改作息。",
-        benefit: "精力與長期健康",
-        evidence: "A",
-        money: "0",
-        time: "少",
-        will: "些",
-        stages: ["student", "early", "mid", "senior"],
-        tags: []
-      },
-      {
-        id: "05-auto-renew",
-        chapter: "05-不要浪費錢",
-        title: "關掉所有自動續費，改為到期手動續",
-        say: "很多人忘記取消訂閱，長期默默扣款。",
-        cost: "一次花 10–20 分鐘檢查。",
-        benefit: "直接省錢",
-        evidence: "C",
-        money: "0",
-        time: "少",
-        will: "否",
-        stages: ["student", "early", "mid", "senior"],
-        tags: []
-      },
-      {
-        id: "05-phone-plan",
-        chapter: "05-不要浪費錢",
-        title: "重算手機與寬頻套餐",
-        say: "很多舊套餐其實可以更便宜。",
-        cost: "一次比較與辦理時間。",
-        benefit: "每月固定省錢",
-        evidence: "C",
-        money: "0",
-        time: "中",
-        will: "否",
-        stages: ["student", "early", "mid"],
-        tags: []
-      },
-      {
-        id: "07-unemploy",
-        chapter: "07-沒錢的時候怎麼活",
-        title: "失業後先申請失業保險金",
-        say: "符合條件就去申請，別因為覺得麻煩而放棄。",
-        cost: "時間成本。",
-        benefit: "現金流緩衝",
-        evidence: "A",
-        money: "0",
-        time: "中",
-        will: "否",
-        stages: ["early", "mid"],
-        tags: ["unemployed"]
-      },
-      {
-        id: "08-guarantee",
-        chapter: "08-別把自己搭進去",
-        title: "原則上不要替人擔保（尤其是大額）",
-        say: "擔保出問題時，法律上你可能要直接還錢。",
-        cost: "拒絕的社交成本。",
-        benefit: "避免巨大財務風險",
-        evidence: "A",
-        money: "0",
-        time: "少",
-        will: "些",
-        stages: ["early", "mid", "senior"],
-        tags: []
-      },
-      {
-        id: "09-rumor",
-        chapter: "09-普通人容易踩的法律紅線",
-        title: "不要轉發未核實的負面訊息（尤其是涉及具體人或單位）",
-        say: "可能構成誹謗或相關法律風險。",
-        cost: "不花錢。",
-        benefit: "降低法律風險",
-        evidence: "A",
-        money: "0",
-        time: "少",
-        will: "否",
-        stages: ["student", "early", "mid", "senior"],
-        tags: []
-      },
-      {
-        id: "13-firstaid",
-        chapter: "13-緊急情況",
-        title: "學基本急救（止血、海姆立克、CPR 意識）",
-        say: "關鍵時刻可能救自己或身邊人。",
-        cost: "課程時間與少量費用。",
-        benefit: "緊急情況下的生存機會",
-        evidence: "A",
-        money: "少",
-        time: "中",
-        will: "些",
-        stages: ["early", "mid", "senior"],
-        tags: ["has_kids"]
-      },
-      {
-        id: "15-deposit",
-        chapter: "15-租房與買房",
-        title: "租房時仔細核對押金條款與房屋產權",
-        say: "避免押金糾紛與被騙。",
-        cost: "簽約前多花時間檢查。",
-        benefit: "降低金錢損失風險",
-        evidence: "B",
-        money: "0",
-        time: "中",
-        will: "否",
-        stages: ["student", "early", "mid"],
-        tags: ["rent"]
-      },
-      {
-        id: "16-chronic",
-        chapter: "16-得了慢性病之後怎麼活",
-        title: "確診慢性病後，先搞清楚正規治療路徑與複診節奏",
-        say: "不要只靠網絡偏方。",
-        cost: "時間與正規醫療費用。",
-        benefit: "長期健康管理",
-        evidence: "A",
-        money: "中",
-        time: "中",
-        will: "些",
-        stages: ["mid", "senior"],
-        tags: ["chronic"]
-      },
-      {
-        id: "19-layoff",
-        chapter: "19-在職離職和工傷",
-        title: "被裁時先算清 N（經濟補償）",
-        say: "每滿一年一個月工資，不滿半年按半個月，滿半年按一年算。",
-        cost: "計算與溝通時間。",
-        benefit: "依法拿到應有補償",
-        evidence: "A",
-        money: "0",
-        time: "中",
-        will: "否",
-        stages: ["early", "mid"],
-        tags: ["unemployed"]
-      },
-      {
-        id: "20-baby-sleep",
-        chapter: "20-剛出生的孩子怎麼帶",
-        title: "嬰兒仰睡，減少猝死風險",
-        say: "這是有明確證據的安全睡眠建議。",
-        cost: "不花錢。",
-        benefit: "降低嬰兒猝死風險",
-        evidence: "A",
-        money: "0",
-        time: "少",
-        will: "否",
-        stages: ["early", "mid"],
-        tags: ["has_kids", "pregnant"]
-      },
-      {
-        id: "23-skill",
-        chapter: "23-學什麼技能划算",
-        title: "優先學可驗證、有市場需求的技能",
-        say: "證書要能查、技能要能演示。",
-        cost: "時間與課程費用。",
-        benefit: "提高就業與議價能力",
-        evidence: "B",
-        money: "中",
-        time: "多",
-        will: "是",
-        stages: ["student", "early"],
-        tags: []
-      },
-      {
-        id: "11-tech-line",
-        chapter: "11-程序員和技術人容易踩的紅線",
-        title: "接私活或做平台前，先搞清楚合規與合同風險",
-        say: "技術人常忽略法律與資質問題。",
-        cost: "諮詢與學習時間。",
-        benefit: "避免法律與金錢風險",
-        evidence: "B",
-        money: "少",
-        time: "中",
-        will: "否",
-        stages: ["early", "mid"],
-        tags: ["tech"]
-      },
-      {
-        id: "04-commute",
-        chapter: "04-不要浪費時間",
-        title: "認真算通勤的時間成本",
-        say: "每天兩小時通勤，一年就是很大一筆時間。",
-        cost: "思考與可能換工作的成本。",
-        benefit: "取回大量可支配時間",
-        evidence: "B",
-        money: "0",
-        time: "少",
-        will: "些",
-        stages: ["early", "mid"],
-        tags: []
-      },
-      {
-        id: "01-gas",
-        chapter: "01-不要早死",
-        title: "注意燃氣安全（定期檢查、安裝報警器）",
-        say: "燃氣事故後果極嚴重，預防成本很低。",
-        cost: "報警器與檢查費用不高。",
-        benefit: "大幅降低致命風險",
-        evidence: "A",
-        money: "少",
-        time: "少",
-        will: "否",
-        stages: ["early", "mid", "senior"],
-        tags: ["own_house", "rent"]
-      }
+      // ===== 01 不要早死 =====
+      { id:"01-01", chapter:"01-不要早死", title:"戒煙，越早越好", say:"吸煙的人平均比不吸煙的人少活十年以上。40歲前戒掉，能把繼續吸煙帶來的死亡風險抹掉九成左右。", cost:"不花錢，反而省錢。難在戒斷期要熬。", benefit:"預期壽命多約10年（25–34歲戒）", evidence:"A", money:"0", time:"少", will:"是", stages:["early","mid","senior"], tags:[] },
+      { id:"01-02", chapter:"01-不要早死", title:"別在家裡和車裡抽煙，也別讓客人抽", say:"全球每年約60萬人死於二手煙，其中近三成是孩子。", cost:"不花錢。難在要開口讓家人別抽。", benefit:"降低全家心血管與癌症風險", evidence:"A", money:"0", time:"少", will:"些", stages:["early","mid","senior"], tags:["has_kids"] },
+      { id:"01-03", chapter:"01-不要早死", title:"注意燃氣安全（定期檢查、裝報警器）", say:"燃氣事故後果極嚴重，預防成本很低。", cost:"報警器與檢查費用不高。", benefit:"大幅降低致命風險", evidence:"A", money:"少", time:"少", will:"否", stages:["early","mid","senior"], tags:["own_house","rent"] },
+      { id:"01-04", chapter:"01-不要早死", title:"不要採食野生蘑菇", say:"每年都有因野生蘑菇中毒死亡的案例，土辦法試毒不可靠。", cost:"不花錢。", benefit:"避免中毒死亡", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid","senior"], tags:[] },
+      { id:"01-05", chapter:"01-不要早死", title:"上車系安全帶、騎車戴頭盔", say:"交通意外是年輕人重要死因，預防措施證據明確。", cost:"不花錢或買頭盔一次。", benefit:"大幅降低重傷與死亡風險", evidence:"A", money:"少", time:"少", will:"否", stages:["student","early","mid","senior"], tags:[] },
+
+      // ===== 02 不要慢慢死 =====
+      { id:"02-01", chapter:"02-不要慢慢死", title:"把家裡的食鹽換成低鈉鹽（鉀鹽）", say:"兩萬人隨機試驗：換成低鈉鹽的人五年內死亡概率低約12%，中風低約14%。", cost:"每袋貴幾元，買時順手換。", benefit:"總死亡率↓12%，中風↓14%", evidence:"A", money:"少", time:"少", will:"否", stages:["early","mid","senior"], tags:[] },
+      { id:"02-02", chapter:"02-不要慢慢死", title:"每天吃一小把堅果（約28克）", say:"常吃堅果的人同期死亡概率比不吃的人低約兩成。", cost:"一年約兩三百元。", benefit:"總死亡率降低約20%", evidence:"A", money:"少", time:"少", will:"否", stages:["early","mid","senior"], tags:[] },
+      { id:"02-03", chapter:"02-不要慢慢死", title:"每天走到7000–8000步", say:"走路是成本極低、證據很硬的長壽行為。", cost:"不花錢，需要時間。", benefit:"降低總死亡率與多種慢性病風險", evidence:"A", money:"0", time:"中", will:"些", stages:["early","mid","senior"], tags:[] },
+      { id:"02-04", chapter:"02-不要慢慢死", title:"每晚睡大約7小時", say:"睡眠過少或過多都與更高死亡率相關。", cost:"不花錢，要改作息。", benefit:"精力與長期健康", evidence:"A", money:"0", time:"少", will:"些", stages:["student","early","mid","senior"], tags:[] },
+      { id:"02-05", chapter:"02-不要慢慢死", title:"不喝含糖飲料", say:"含糖飲料與肥胖、糖尿病、心血管風險上升有關。", cost:"不花錢（改喝水）。", benefit:"降低代謝疾病風險", evidence:"A", money:"0", time:"少", will:"些", stages:["student","early","mid"], tags:[] },
+      { id:"02-06", chapter:"02-不要慢慢死", title:"少吃加工肉（香腸、培根等）", say:"加工肉與大腸癌等風險上升有明確關聯。", cost:"不花錢。", benefit:"降低癌症風險", evidence:"A", money:"0", time:"少", will:"些", stages:["early","mid","senior"], tags:[] },
+      { id:"02-07", chapter:"02-不要慢慢死", title:"精米白麵盡量換成全穀物", say:"全穀物與較低總死亡率相關。", cost:"價格略高一點。", benefit:"降低慢性病風險", evidence:"A", money:"少", time:"少", will:"些", stages:["early","mid","senior"], tags:[] },
+      { id:"02-08", chapter:"02-不要慢慢死", title:"每周做力量訓練", say:"力量訓練對骨骼、肌肉與代謝都有好處。", cost:"可在家徒手或去健身房。", benefit:"降低死亡率、維持功能", evidence:"A", money:"少", time:"中", will:"是", stages:["early","mid","senior"], tags:[] },
+      { id:"02-09", chapter:"02-不要慢慢死", title:"少喝或不喝酒", say:"即使少量飲酒，對健康的淨收益也越來越被質疑。", cost:"不花錢。", benefit:"降低多種疾病風險", evidence:"A", money:"0", time:"少", will:"些", stages:["early","mid","senior"], tags:[] },
+      { id:"02-10", chapter:"02-不要慢慢死", title:"做飯開抽油煙機", say:"廚房油煙與呼吸道疾病相關。", cost:"不花錢。", benefit:"保護肺部", evidence:"B", money:"0", time:"少", will:"否", stages:["early","mid","senior"], tags:[] },
+
+      // ===== 03 不要浪費精力 =====
+      { id:"03-01", chapter:"03-不要浪費精力", title:"關閉非必要通知，批量處理訊息", say:"頻繁被打斷會嚴重降低深度工作與休息品質。", cost:"設定一次即可。", benefit:"取回注意力與精力", evidence:"B", money:"0", time:"少", will:"些", stages:["student","early","mid"], tags:[] },
+      { id:"03-02", chapter:"03-不要浪費精力", title:"痛經別硬扛，必要時就醫或用藥", say:"很多女性長期忍受本可緩解的痛苦。", cost:"藥物或就診費用。", benefit:"改善生活品質", evidence:"A", money:"少", time:"少", will:"否", stages:["student","early","mid"], tags:[] },
+
+      // ===== 04 不要浪費時間 =====
+      { id:"04-01", chapter:"04-不要浪費時間", title:"認真算通勤的時間成本", say:"每天兩小時通勤，一年就是很大一筆時間。", cost:"思考與可能換工作的成本。", benefit:"取回大量可支配時間", evidence:"B", money:"0", time:"少", will:"些", stages:["early","mid"], tags:[] },
+      { id:"04-02", chapter:"04-不要浪費時間", title:"識別沉沒成本，該停就停", say:"已經花掉的時間或錢不應成為繼續的理由。", cost:"心理上接受止損。", benefit:"避免繼續浪費", evidence:"B", money:"0", time:"少", will:"些", stages:["student","early","mid"], tags:[] },
+
+      // ===== 05 不要浪費錢 =====
+      { id:"05-01", chapter:"05-不要浪費錢", title:"關掉所有自動續費，改為到期手動續", say:"很多人忘記取消訂閱，長期默默扣款。", cost:"一次花10–20分鐘檢查。", benefit:"直接省錢", evidence:"C", money:"0", time:"少", will:"否", stages:["student","early","mid","senior"], tags:[] },
+      { id:"05-02", chapter:"05-不要浪費錢", title:"每年做一次個稅匯算，該填的扣除填上", say:"換過工作、有子女教育/房租/房貸等扣除的人，常能退到錢。", cost:"手機App十幾分鐘。", benefit:"可能退稅", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid"], tags:[] },
+      { id:"05-03", chapter:"05-不要浪費錢", title:"公積金租房、裝修、物業費也能提", say:"新條例明確可提取範圍擴大，別讓錢躺著吃低利息。", cost:"辦一次提取手續。", benefit:"提高資金使用效率", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid"], tags:["rent","own_house"] },
+      { id:"05-04", chapter:"05-不要浪費錢", title:"每年重算手機和寬頻套餐", say:"老套餐往往比新套餐貴，不換就是白扔錢。", cost:"查賬單與辦理時間。", benefit:"每月固定省錢", evidence:"A", money:"0", time:"少", will:"些", stages:["student","early","mid"], tags:[] },
+      { id:"05-05", chapter:"05-不要浪費錢", title:"不買彩票（當娛樂可以，當理財不行）", say:"長期平均下來一定虧，這是制度定死的。", cost:"不買就省。", benefit:"避免穩定虧損", evidence:"A", money:"0", time:"少", will:"否", stages:["student","early","mid","senior"], tags:[] },
+      { id:"05-06", chapter:"05-不要浪費錢", title:"看到「高收益」「保本」「穩賺」直接走開", say:"收益率超過6%要打問號，超過8%很危險，10%以上準備賠光本金。", cost:"不花錢。", benefit:"避免本金損失", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid","senior"], tags:[] },
+      { id:"05-07", chapter:"05-不要浪費錢", title:"信用卡盡量全額還款，慎用分期", say:"最低還款與分期實際年化利息往往很高。", cost:"需要有現金流規劃。", benefit:"避免高息負債", evidence:"A", money:"0", time:"少", will:"些", stages:["early","mid"], tags:[] },
+      { id:"05-08", chapter:"05-不要浪費錢", title:"先存應急金（3–6個月開支）", say:"沒有應急金時，一次意外就可能被迫借高息債。", cost:"需要儲蓄紀律。", benefit:"財務安全墊", evidence:"B", money:"0", time:"多", will:"是", stages:["early","mid"], tags:[] },
+      { id:"05-09", chapter:"05-不要浪費錢", title:"別買虛擬貨幣當投資", say:"波動極大且缺乏內在價值支撐，多數人最終虧損。", cost:"不買就好。", benefit:"避免大幅虧損", evidence:"B", money:"0", time:"少", will:"否", stages:["student","early","mid"], tags:[] },
+      { id:"05-10", chapter:"05-不要浪費錢", title:"保險優先買消費型，只保扛不住的大損失", say:"返還型保險通常更貴，保障效率較低。", cost:"保費。", benefit:"用較低成本轉移大風險", evidence:"B", money:"中", time:"中", will:"否", stages:["early","mid"], tags:["has_kids"] },
+
+      // ===== 07 沒錢的時候怎麼活 =====
+      { id:"07-01", chapter:"07-沒錢的時候怎麼活", title:"失業後先申請失業保險金", say:"符合條件就去申請，別因為覺得麻煩而放棄。", cost:"時間成本。", benefit:"現金流緩衝", evidence:"A", money:"0", time:"中", will:"否", stages:["early","mid"], tags:["unemployed"] },
+      { id:"07-02", chapter:"07-沒錢的時候怎麼活", title:"被欠薪可申請勞動仲裁", say:"勞動仲裁是處理工資爭議的正規途徑。", cost:"時間與可能的法律援助。", benefit:"追回應得工資", evidence:"A", money:"0", time:"中", will:"些", stages:["early","mid"], tags:["unemployed"] },
+
+      // ===== 08 別把自己搭進去 =====
+      { id:"08-01", chapter:"08-別把自己搭進去", title:"原則上不要替人擔保（尤其大額）", say:"擔保出問題時，法律上你可能要直接還錢。", cost:"拒絕的社交成本。", benefit:"避免巨大財務風險", evidence:"A", money:"0", time:"少", will:"些", stages:["early","mid","senior"], tags:[] },
+      { id:"08-02", chapter:"08-別把自己搭進去", title:"婚前財產與債務要分清", say:"結婚前的個人財產與債務歸屬有明確規則，但實務中常出爭議。", cost:"溝通與必要時公證。", benefit:"降低婚姻財務風險", evidence:"A", money:"少", time:"中", will:"些", stages:["early","mid"], tags:[] },
+      { id:"08-03", chapter:"08-別把自己搭進去", title:"被騙後盡快止付、報警、保留證據", say:"時間越短，追回的機會越大。", cost:"即時行動。", benefit:"提高追回可能", evidence:"A", money:"0", time:"少", will:"否", stages:["student","early","mid","senior"], tags:[] },
+
+      // ===== 09 法律紅線 =====
+      { id:"09-01", chapter:"09-普通人容易踩的法律紅線", title:"不要轉發未核實的負面訊息", say:"可能構成誹謗或相關法律風險。", cost:"不花錢。", benefit:"降低法律風險", evidence:"A", money:"0", time:"少", will:"否", stages:["student","early","mid","senior"], tags:[] },
+      { id:"09-02", chapter:"09-普通人容易踩的法律紅線", title:"不要幫忙「刷流水」或提供帳戶給陌生人", say:"可能涉嫌幫助信息網絡犯罪。", cost:"拒絕即可。", benefit:"避免刑事風險", evidence:"A", money:"0", time:"少", will:"否", stages:["student","early","mid"], tags:[] },
+
+      // ===== 11 程序員紅線 =====
+      { id:"11-01", chapter:"11-程序員和技術人容易踩的紅線", title:"接私活或做平台前，先搞清楚合規與合同", say:"技術人常忽略法律與資質問題。", cost:"諮詢與學習時間。", benefit:"避免法律與金錢風險", evidence:"B", money:"少", time:"中", will:"否", stages:["early","mid"], tags:["tech"] },
+
+      // ===== 13 緊急情況 =====
+      { id:"13-01", chapter:"13-緊急情況", title:"學基本急救（止血、海姆立克、CPR意識）", say:"關鍵時刻可能救自己或身邊人。", cost:"課程時間與少量費用。", benefit:"緊急情況下的生存機會", evidence:"A", money:"少", time:"中", will:"些", stages:["early","mid","senior"], tags:["has_kids"] },
+      { id:"13-02", chapter:"13-緊急情況", title:"家中備基本應急物品（手電筒、常用藥、飲水）", say:"停電、極端天氣時很有用。", cost:"一次性小額開支。", benefit:"提高應急能力", evidence:"B", money:"少", time:"少", will:"否", stages:["early","mid","senior"], tags:[] },
+
+      // ===== 15 租房與買房 =====
+      { id:"15-01", chapter:"15-租房與買房", title:"租房時仔細核對押金條款與房屋產權", say:"避免押金糾紛與被騙。", cost:"簽約前多花時間檢查。", benefit:"降低金錢損失風險", evidence:"B", money:"0", time:"中", will:"否", stages:["student","early","mid"], tags:["rent"] },
+      { id:"15-02", chapter:"15-租房與買房", title:"買房前查清產權、抵押與限購政策", say:"產權不清或政策限制會造成重大損失。", cost:"查冊與諮詢時間。", benefit:"避免重大風險", evidence:"A", money:"少", time:"中", will:"否", stages:["early","mid"], tags:["own_house"] },
+
+      // ===== 16 慢性病 =====
+      { id:"16-01", chapter:"16-得了慢性病之後怎麼活", title:"確診後先搞清楚正規治療路徑與複診節奏", say:"不要只靠網絡偏方。", cost:"時間與正規醫療費用。", benefit:"長期健康管理", evidence:"A", money:"中", time:"中", will:"些", stages:["mid","senior"], tags:["chronic"] },
+
+      // ===== 19 在職離職 =====
+      { id:"19-01", chapter:"19-在職離職和工傷", title:"被裁時先算清N（經濟補償）", say:"每滿一年一個月工資，不滿半年按半個月，滿半年按一年算。", cost:"計算與溝通時間。", benefit:"依法拿到應有補償", evidence:"A", money:"0", time:"中", will:"否", stages:["early","mid"], tags:["unemployed"] },
+      { id:"19-02", chapter:"19-在職離職和工傷", title:"離職時確認社保與公積金已結清轉移", say:"避免之後補繳麻煩。", cost:"辦理手續時間。", benefit:"權益完整", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid"], tags:[] },
+
+      // ===== 20 剛出生的孩子 =====
+      { id:"20-01", chapter:"20-剛出生的孩子怎麼帶", title:"嬰兒仰睡，減少猝死風險", say:"這是有明確證據的安全睡眠建議。", cost:"不花錢。", benefit:"降低嬰兒猝死風險", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid"], tags:["has_kids","pregnant"] },
+      { id:"20-02", chapter:"20-剛出生的孩子怎麼帶", title:"按免疫規劃及時接種疫苗", say:"疫苗是性價比極高的預防措施。", cost:"多數納入公費或醫保。", benefit:"大幅降低傳染病風險", evidence:"A", money:"少", time:"少", will:"否", stages:["early","mid"], tags:["has_kids","pregnant"] },
+
+      // ===== 23 學技能 =====
+      { id:"23-01", chapter:"23-學什麼技能划算", title:"優先學可驗證、有市場需求的技能", say:"證書要能查、技能要能演示。", cost:"時間與課程費用。", benefit:"提高就業與議價能力", evidence:"B", money:"中", time:"多", will:"是", stages:["student","early"], tags:[] },
+
+      // ===== 其他高性價比 =====
+      { id:"misc-01", chapter:"02-不要慢慢死", title:"認真刷牙並清潔牙縫", say:"口腔健康與全身炎症、心血管風險有關。", cost:"牙刷牙線成本很低。", benefit:"降低口腔與系統性疾病風險", evidence:"A", money:"少", time:"少", will:"些", stages:["student","early","mid","senior"], tags:[] },
+      { id:"misc-02", chapter:"02-不要慢慢死", title:"白天適當曬太陽（注意防曬）", say:"有助於維生素D，但要避免過度暴曬。", cost:"不花錢。", benefit:"骨骼與免疫相關", evidence:"B", money:"0", time:"少", will:"否", stages:["early","mid","senior"], tags:[] },
+      { id:"misc-03", chapter:"05-不要浪費錢", title:"大額購買設冷靜期再決定", say:"衝動消費是常見的金錢浪費來源。", cost:"等一兩天。", benefit:"減少後悔消費", evidence:"C", money:"0", time:"少", will:"些", stages:["student","early","mid"], tags:[] },
+      { id:"misc-04", chapter:"08-別把自己搭進去", title:"養犬必須牽繩並盡到管理責任", say:"狗傷人可能承擔民事甚至刑事責任。", cost:"牽繩與管理習慣。", benefit:"避免賠償與法律風險", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid","senior"], tags:[] }
     ];
 
     // ========== 狀態 ==========
