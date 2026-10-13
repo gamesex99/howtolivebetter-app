@@ -6,7 +6,7 @@
   <title>高性價比人生指南 · 個人行動版</title>
   <meta name="description" content="基於《高性價比人生指南》的純前端個人進度追蹤與人生階段推薦工具。資料來源：eternity4719/HowToLiveBetter (CC BY 4.0)" />
   <style>
-    :root {
+    :root, [data-theme="dark"] {
       --bg: #0f1419;
       --card: #1a2332;
       --card-hover: #243044;
@@ -16,8 +16,20 @@
       --accent: #3b82f6;
       --accent2: #22c55e;
       --warn: #f59e0b;
-      --danger: #ef4444;
       --radius: 12px;
+      --daily-bg: linear-gradient(135deg, #1e3a5f 0%, #1a2332 100%);
+    }
+    [data-theme="light"] {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --card-hover: #f0f4f8;
+      --border: #d1d9e6;
+      --text: #1a2332;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent2: #16a34a;
+      --warn: #d97706;
+      --daily-bg: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -26,27 +38,34 @@
       color: var(--text);
       line-height: 1.6;
       min-height: 100vh;
+      transition: background 0.2s, color 0.2s;
     }
     .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
     header {
-      padding: 24px 0 16px;
+      padding: 20px 0 14px;
       border-bottom: 1px solid var(--border);
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
     }
-    header h1 { font-size: 1.5rem; font-weight: 700; }
-    header p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+    header h1 { font-size: 1.45rem; font-weight: 700; }
+    header p { color: var(--muted); font-size: 0.88rem; margin-top: 4px; }
     .badge {
       display: inline-block;
       font-size: 0.7rem;
       padding: 2px 8px;
       border-radius: 999px;
-      background: #1e3a5f;
-      color: #93c5fd;
-      margin-left: 8px;
+      background: var(--accent);
+      color: #fff;
+      margin-left: 6px;
       vertical-align: middle;
+      opacity: 0.85;
     }
+    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-    /* Profile setup */
     #setup {
       background: var(--card);
       border: 1px solid var(--border);
@@ -57,16 +76,15 @@
     #setup h2 { margin-bottom: 16px; font-size: 1.2rem; }
     .form-row { margin-bottom: 16px; }
     .form-row label { display: block; color: var(--muted); font-size: 0.85rem; margin-bottom: 6px; }
-    select, input[type="text"] {
-      width: 100%;
-      max-width: 320px;
+    select, input[type="text"], input[type="search"] {
       padding: 10px 12px;
       border-radius: 8px;
       border: 1px solid var(--border);
       background: var(--bg);
       color: var(--text);
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
+    select { max-width: 320px; width: 100%; }
     .chips { display: flex; flex-wrap: wrap; gap: 8px; }
     .chip {
       padding: 6px 14px;
@@ -76,167 +94,234 @@
       color: var(--text);
       cursor: pointer;
       font-size: 0.9rem;
-      transition: all 0.15s;
     }
     .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
     .btn {
       display: inline-block;
-      padding: 10px 20px;
+      padding: 10px 18px;
       border-radius: 8px;
       border: none;
       background: var(--accent);
       color: #fff;
-      font-size: 1rem;
+      font-size: 0.95rem;
       cursor: pointer;
       font-weight: 600;
     }
     .btn:hover { opacity: 0.9; }
     .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
-    .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+    .btn-sm { padding: 6px 12px; font-size: 0.82rem; }
+    .btn-ghost { background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 0.85rem; }
+    .btn-ghost:hover { color: var(--accent); }
 
-    /* Stats bar */
     .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
     }
     .stat-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 14px;
+      padding: 12px;
       text-align: center;
     }
-    .stat-card .num { font-size: 1.6rem; font-weight: 700; color: var(--accent2); }
-    .stat-card .label { font-size: 0.8rem; color: var(--muted); }
+    .stat-card .num { font-size: 1.45rem; font-weight: 700; color: var(--accent2); }
+    .stat-card .label { font-size: 0.75rem; color: var(--muted); }
 
-    /* Toolbar */
+    .chapter-stats {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .chapter-stats.show { display: block; }
+    .chapter-stats h3 { font-size: 0.9rem; margin-bottom: 10px; color: var(--muted); }
+    .ch-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+    }
+    .ch-bar .name { width: 140px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ch-bar .track {
+      flex: 1;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .ch-bar .fill {
+      height: 100%;
+      background: var(--accent2);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+    .ch-bar .pct { width: 40px; text-align: right; color: var(--muted); }
+
     .toolbar {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 8px;
+      margin-bottom: 14px;
       align-items: center;
     }
     .toolbar input[type="search"] {
       flex: 1;
-      min-width: 200px;
-      padding: 10px 14px;
-      border-radius: 8px;
+      min-width: 180px;
+    }
+    .filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .filters select { width: auto; max-width: none; padding: 8px 10px; font-size: 0.85rem; }
+
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+
+    .scenario-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .scenario-btn {
+      padding: 6px 12px;
+      border-radius: 999px;
       border: 1px solid var(--border);
       background: var(--card);
       color: var(--text);
+      font-size: 0.82rem;
+      cursor: pointer;
     }
-    .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+    .scenario-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
 
-    /* Cards */
-    .list { display: flex; flex-direction: column; gap: 12px; }
+    .daily-card {
+      background: var(--daily-bg);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      margin-bottom: 16px;
+    }
+    .daily-label { font-size: 0.72rem; color: var(--accent); letter-spacing: 0.04em; margin-bottom: 4px; font-weight: 600; }
+    .daily-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .daily-say { color: var(--muted); font-size: 0.92rem; margin-bottom: 10px; }
+    .daily-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .daily-meta { font-size: 0.78rem; color: var(--muted); }
+
+    .list { display: flex; flex-direction: column; gap: 10px; }
     .item {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px;
-      transition: background 0.15s;
+      padding: 14px;
+      transition: background 0.15s, border-color 0.15s;
     }
     .item:hover { background: var(--card-hover); }
-    .item.done { opacity: 0.7; border-color: #166534; }
-    .item-header {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-    }
+    .item.done { opacity: 0.65; border-color: var(--accent2); }
+    .item.fav { border-color: var(--warn); }
+    .item-header { display: flex; gap: 10px; align-items: flex-start; }
     .item-header input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      margin-top: 3px;
-      cursor: pointer;
-      accent-color: var(--accent2);
+      width: 18px; height: 18px; margin-top: 3px; cursor: pointer; accent-color: var(--accent2);
     }
-    .item-title { font-weight: 600; font-size: 1.05rem; flex: 1; }
-    .item-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin: 8px 0;
+    .item-title { font-weight: 600; font-size: 1rem; flex: 1; }
+    .star-btn {
+      background: none; border: none; cursor: pointer; font-size: 1.2rem;
+      color: var(--muted); padding: 0 4px; line-height: 1;
     }
+    .star-btn.on { color: var(--warn); }
+    .item-meta { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
     .tag {
-      font-size: 0.75rem;
-      padding: 2px 8px;
-      border-radius: 6px;
-      background: #1e293b;
+      font-size: 0.72rem;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: var(--border);
       color: var(--muted);
     }
     .tag.a { background: #14532d; color: #86efac; }
     .tag.b { background: #713f12; color: #fde68a; }
     .tag.c { background: #44403c; color: #d6d3d1; }
+    [data-theme="light"] .tag.a { background: #dcfce7; color: #166534; }
+    [data-theme="light"] .tag.b { background: #fef3c7; color: #92400e; }
+    [data-theme="light"] .tag.c { background: #e7e5e4; color: #57534e; }
     .tag.cost0 { background: #164e63; color: #67e8f9; }
-    .say { color: var(--muted); font-size: 0.95rem; margin: 6px 0; }
-    .cost-benefit { font-size: 0.85rem; color: #94a3b8; }
-    .item-footer { margin-top: 10px; font-size: 0.8rem; color: var(--muted); }
+    [data-theme="light"] .tag.cost0 { background: #cffafe; color: #0e7490; }
+    .say { color: var(--muted); font-size: 0.9rem; margin: 4px 0; }
+    .cost-benefit { font-size: 0.82rem; color: var(--muted); }
 
-    /* 每日推薦 */
-    .daily-card {
-      background: linear-gradient(135deg, #1e3a5f 0%, #1a2332 100%);
-      border: 1px solid #3b82f6;
-      border-radius: var(--radius);
-      padding: 18px 20px;
-      margin-bottom: 20px;
-      position: relative;
-    }
-    .daily-card .daily-label {
-      font-size: 0.75rem;
-      color: #93c5fd;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 6px;
-    }
-    .daily-card .daily-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .daily-card .daily-say {
-      color: var(--muted);
+    /* toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--accent2);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-weight: 600;
       font-size: 0.95rem;
-      margin-bottom: 10px;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 100;
+      pointer-events: none;
     }
-    .daily-card .daily-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .daily-card .daily-meta {
-      font-size: 0.8rem;
-      color: #94a3b8;
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
     footer {
-      margin-top: 40px;
-      padding: 20px 0;
+      margin-top: 36px;
+      padding: 18px 0;
       border-top: 1px solid var(--border);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--muted);
       text-align: center;
     }
-    footer a { color: #93c5fd; }
-
+    footer a { color: var(--accent); }
     .hidden { display: none !important; }
+
     @media (max-width: 600px) {
-      header h1 { font-size: 1.25rem; }
+      header h1 { font-size: 1.2rem; }
       .stats { grid-template-columns: 1fr 1fr; }
+      .ch-bar .name { width: 100px; }
     }
   </style>
 </head>
-<body>
+<body data-theme="dark">
   <div class="container">
     <header>
-      <h1>高性價比人生指南 <span class="badge">個人行動版</span></h1>
-      <p>按人生階段推薦 · 進度追蹤 · 純前端 · 資料存於本機瀏覽器</p>
+      <div>
+        <h1>高性價比人生指南 <span class="badge">個人行動版</span></h1>
+        <p>人生階段推薦 · 進度追蹤 · 收藏 · 每日推薦 · 純前端</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary btn-sm" id="themeBtn">亮色</button>
+        <button class="btn btn-secondary btn-sm" id="exportBtn">匯出進度</button>
+        <button class="btn btn-secondary btn-sm" id="importBtn">匯入進度</button>
+        <input type="file" id="importFile" accept=".json" class="hidden" />
+      </div>
     </header>
 
-    <!-- 初次設定 -->
     <section id="setup">
       <h2>先設定你的情況</h2>
       <div class="form-row">
@@ -263,19 +348,33 @@
       <button class="btn" id="startBtn">開始使用</button>
     </section>
 
-    <!-- 主介面 -->
     <section id="main" class="hidden">
-      <!-- 每日推薦 -->
       <div id="dailyCard" class="daily-card"></div>
 
       <div class="stats" id="stats"></div>
+      <div class="chapter-stats" id="chapterStats"></div>
+
+      <div class="scenario-bar" id="scenarioBar">
+        <button class="scenario-btn active" data-scene="">全部</button>
+        <button class="scenario-btn" data-scene="layoff">被裁之後</button>
+        <button class="scenario-btn" data-scene="money">省錢理財</button>
+        <button class="scenario-btn" data-scene="health">健康長壽</button>
+        <button class="scenario-btn" data-scene="legal">法律風險</button>
+        <button class="scenario-btn" data-scene="family">家庭育兒</button>
+        <button class="scenario-btn" data-scene="career">工作技能</button>
+      </div>
+
+      <div class="toggle-row">
+        <label class="toggle"><input type="checkbox" id="onlyMine" /> 只睇適合我</label>
+        <label class="toggle"><input type="checkbox" id="onlyFav" /> 只睇收藏</label>
+        <label class="toggle"><input type="checkbox" id="showChStats" /> 顯示章節完成率</label>
+        <button class="btn btn-secondary btn-sm" id="randomBtn">隨機挑戰</button>
+      </div>
 
       <div class="toolbar">
-        <input type="search" id="search" placeholder="搜尋關鍵字（例如：鹽、睡眠、失業…）" />
+        <input type="search" id="search" placeholder="搜尋關鍵字…" />
         <div class="filters">
-          <select id="filterChapter">
-            <option value="">全部章節</option>
-          </select>
+          <select id="filterChapter"><option value="">全部章節</option></select>
           <select id="filterEvidence">
             <option value="">全部證據</option>
             <option value="A">A 級</option>
@@ -299,18 +398,18 @@
       <div class="list" id="list"></div>
     </section>
 
-
     <footer>
       內容改編自 <a href="https://github.com/eternity4719/HowToLiveBetter" target="_blank" rel="noopener">eternity4719/HowToLiveBetter</a>
       《高性價比人生指南》（CC BY 4.0）。<br>
-      本工具為非官方衍生作品，進度資料只存於你本機瀏覽器，不會上傳。<br>
+      本工具為非官方衍生作品，進度與收藏只存於你本機瀏覽器。<br>
       健康與法律建議請以醫生、律師及官方最新規定為準。
     </footer>
   </div>
 
+  <div class="toast" id="toast"></div>
+
   <script>
-    // ========== 精選真實條目（可之後自行擴充） ==========
-    const ENTRIES = [
+const ENTRIES = [
       // ===== 01 不要早死 =====
       { id:"01-01", chapter:"01-不要早死", title:"戒煙，越早越好", say:"吸煙的人平均比不吸煙的人少活十年以上。40歲前戒掉，能把繼續吸煙帶來的死亡風險抹掉九成左右。", cost:"不花錢，反而省錢。難在戒斷期要熬。", benefit:"預期壽命多約10年（25–34歲戒）", evidence:"A", money:"0", time:"少", will:"是", stages:["early","mid","senior"], tags:[] },
       { id:"01-02", chapter:"01-不要早死", title:"別在家裡和車裡抽煙，也別讓客人抽", say:"全球每年約60萬人死於二手煙，其中近三成是孩子。", cost:"不花錢。難在要開口讓家人別抽。", benefit:"降低全家心血管與癌症風險", evidence:"A", money:"0", time:"少", will:"些", stages:["early","mid","senior"], tags:["has_kids"] },
@@ -447,14 +546,27 @@
       { id:"33-01", chapter:"33-殘疾之後怎麼活", title:"了解殘疾人證與相關福利政策", say:"符合條件時應申請，這是法定權益。", cost:"辦理時間。", benefit:"獲得應有支持", evidence:"A", money:"0", time:"中", will:"否", stages:["early","mid","senior"], tags:[] }
     ];
 
-    // ========== 狀態 ==========
+    // 場景關鍵字對應
+    const SCENES = {
+      layoff: ["失業", "被裁", "離職", "工傷", "仲裁", "補償", "N"],
+      money: ["錢", "續費", "套餐", "彩票", "基金", "保險", "信用卡", "公積金", "稅", "投資", "虛擬貨幣", "打賞"],
+      health: ["戒煙", "鹽", "堅果", "睡眠", "步", "運動", "酒", "糖", "肉", "穀", "BMI", "牙", "疫苗", "急救"],
+      legal: ["擔保", "法律", "轉發", "刷流水", "拋物", "合同", "產權", "合規"],
+      family: ["孩子", "嬰兒", "懷孕", "葉酸", "仰睡", "老人", "跌倒", "養"],
+      career: ["技能", "證書", "通勤", "會議", "私活", "平台", "夜班", "專注"]
+    };
+
     const STORAGE_KEY = "htlb_progress_v1";
+    const FAV_KEY = "htlb_fav_v1";
     const PROFILE_KEY = "htlb_profile_v1";
+    const THEME_KEY = "htlb_theme_v1";
 
     let profile = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
     let progress = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    let favs = JSON.parse(localStorage.getItem(FAV_KEY) || "{}");
+    let currentScene = "";
+    let tempDailyId = null;
 
-    // ========== DOM ==========
     const setupEl = document.getElementById("setup");
     const mainEl = document.getElementById("main");
     const stageSel = document.getElementById("stage");
@@ -462,6 +574,7 @@
     const startBtn = document.getElementById("startBtn");
     const listEl = document.getElementById("list");
     const statsEl = document.getElementById("stats");
+    const chapterStatsEl = document.getElementById("chapterStats");
     const searchEl = document.getElementById("search");
     const filterChapter = document.getElementById("filterChapter");
     const filterEvidence = document.getElementById("filterEvidence");
@@ -469,8 +582,33 @@
     const filterDone = document.getElementById("filterDone");
     const resetBtn = document.getElementById("resetProfile");
     const dailyCardEl = document.getElementById("dailyCard");
+    const onlyMine = document.getElementById("onlyMine");
+    const onlyFav = document.getElementById("onlyFav");
+    const showChStats = document.getElementById("showChStats");
+    const randomBtn = document.getElementById("randomBtn");
+    const themeBtn = document.getElementById("themeBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const importBtn = document.getElementById("importBtn");
+    const importFile = document.getElementById("importFile");
+    const toastEl = document.getElementById("toast");
 
-    // chips
+    // theme
+    const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
+    document.body.setAttribute("data-theme", savedTheme);
+    themeBtn.textContent = savedTheme === "dark" ? "亮色" : "暗色";
+    themeBtn.addEventListener("click", () => {
+      const next = document.body.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      document.body.setAttribute("data-theme", next);
+      localStorage.setItem(THEME_KEY, next);
+      themeBtn.textContent = next === "dark" ? "亮色" : "暗色";
+    });
+
+    function toast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 1800);
+    }
+
     situationsEl.querySelectorAll(".chip").forEach(chip => {
       chip.addEventListener("click", () => chip.classList.toggle("active"));
     });
@@ -480,16 +618,13 @@
     }
 
     startBtn.addEventListener("click", () => {
-      profile = {
-        stage: stageSel.value,
-        situations: getSelectedSituations()
-      };
+      profile = { stage: stageSel.value, situations: getSelectedSituations() };
       localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
       showMain();
     });
 
     resetBtn.addEventListener("click", () => {
-      if (confirm("確定重設個人資料？（進度會保留）")) {
+      if (confirm("確定重設個人資料？（進度與收藏會保留）")) {
         localStorage.removeItem(PROFILE_KEY);
         profile = null;
         setupEl.classList.remove("hidden");
@@ -504,7 +639,6 @@
       render();
     }
 
-    // 如果已有 profile，直接進入
     if (profile) {
       stageSel.value = profile.stage || "mid";
       (profile.situations || []).forEach(s => {
@@ -514,18 +648,64 @@
       showMain();
     }
 
-    function saveProgress() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-    }
+    function saveProgress() { localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }
+    function saveFavs() { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); }
+
+    // export / import
+    exportBtn.addEventListener("click", () => {
+      const data = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        profile,
+        progress,
+        favs
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `howtolivebetter-progress-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      toast("已匯出進度");
+    });
+    importBtn.addEventListener("click", () => importFile.click());
+    importFile.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (data.progress) progress = data.progress;
+          if (data.favs) favs = data.favs;
+          if (data.profile) {
+            profile = data.profile;
+            localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+          }
+          saveProgress();
+          saveFavs();
+          toast("已匯入進度");
+          if (profile) showMain();
+          else render();
+        } catch {
+          alert("匯入失敗，請確認係正確的 JSON 檔");
+        }
+      };
+      reader.readAsText(file);
+      importFile.value = "";
+    });
 
     function isRelevant(entry) {
       if (!profile) return true;
-      // 階段匹配
-      if (entry.stages && entry.stages.length && !entry.stages.includes(profile.stage)) {
-        // 仍然顯示，但權重較低（這裡先全部顯示，之後可改成優先）
+      if (!onlyMine.checked) return true;
+      const stageOk = !entry.stages || !entry.stages.length || entry.stages.includes(profile.stage);
+      if (!stageOk) return false;
+      if (entry.tags && entry.tags.length) {
+        const sit = profile.situations || [];
+        // 有 tags 的條目：若用戶有任一對應情況則顯示；若用戶完全無相關情況仍顯示通用條目（tags 空的）
+        // 這裡：有 tags 時，至少要有一個匹配才算「適合我」；無 tags 則視為通用適合
+        return entry.tags.some(t => sit.includes(t));
       }
-      // 有 tags 的條目：如果用戶有對應情況就優先，沒有也不隱藏
-      return true;
+      return true; // 無 tags = 通用
     }
 
     function score(entry) {
@@ -538,6 +718,7 @@
       }
       if (entry.evidence === "A") s += 5;
       if (entry.money === "0") s += 3;
+      if (favs[entry.id]) s += 15;
       return s;
     }
 
@@ -547,10 +728,13 @@
         chapters.map(c => `<option value="${c}">${c}</option>`).join("");
     }
 
-    // 每日推薦：用日期做種子，同一天固定一條，優先未完成 + 高性價比
     function getDailyEntry() {
       const today = new Date().toISOString().slice(0, 10);
       const seed = today.split("-").reduce((a, b) => a + parseInt(b, 10), 0);
+      if (tempDailyId) {
+        const found = ENTRIES.find(e => e.id === tempDailyId);
+        if (found) return found;
+      }
       const candidates = ENTRIES
         .filter(e => !progress[e.id])
         .sort((a, b) => {
@@ -576,44 +760,26 @@
           <span class="daily-meta">證據 ${e.evidence} · 錢：${e.money === "0" ? "不花" : e.money} · ${e.chapter}</span>
         </div>
       `;
-      document.getElementById("dailyDoneBtn").addEventListener("click", () => {
+      document.getElementById("dailyDoneBtn").onclick = () => {
         if (progress[e.id]) delete progress[e.id];
-        else progress[e.id] = Date.now();
+        else { progress[e.id] = Date.now(); toast("已完成 ✓"); }
         saveProgress();
+        tempDailyId = null;
         render();
-      });
-      document.getElementById("dailyAnotherBtn").addEventListener("click", () => {
-        // 臨時換一條（不影響「今日」種子，只係即時換）
+      };
+      document.getElementById("dailyAnotherBtn").onclick = () => {
         const others = ENTRIES.filter(x => x.id !== e.id && !progress[x.id]);
         const pick = others[Math.floor(Math.random() * others.length)] || e;
-        dailyCardEl.dataset.tempId = pick.id;
-        renderDailyTemp(pick);
-      });
+        tempDailyId = pick.id;
+        renderDaily();
+      };
     }
 
-    function renderDailyTemp(e) {
-      const done = !!progress[e.id];
-      dailyCardEl.innerHTML = `
-        <div class="daily-label">臨時推薦</div>
-        <div class="daily-title">${e.title}</div>
-        <p class="daily-say">${e.say}</p>
-        <div class="daily-actions">
-          <button class="btn btn-sm" id="dailyDoneBtn">${done ? "已完成 ✓" : "標記完成"}</button>
-          <button class="btn btn-secondary btn-sm" id="dailyAnotherBtn">再換一條</button>
-          <span class="daily-meta">證據 ${e.evidence} · 錢：${e.money === "0" ? "不花" : e.money} · ${e.chapter}</span>
-        </div>
-      `;
-      document.getElementById("dailyDoneBtn").addEventListener("click", () => {
-        if (progress[e.id]) delete progress[e.id];
-        else progress[e.id] = Date.now();
-        saveProgress();
-        render();
-      });
-      document.getElementById("dailyAnotherBtn").addEventListener("click", () => {
-        const others = ENTRIES.filter(x => x.id !== e.id && !progress[x.id]);
-        const pick = others[Math.floor(Math.random() * others.length)] || e;
-        renderDailyTemp(pick);
-      });
+    function matchScene(entry) {
+      if (!currentScene) return true;
+      const keys = SCENES[currentScene] || [];
+      const text = entry.title + entry.say + entry.chapter;
+      return keys.some(k => text.includes(k));
     }
 
     function getFiltered() {
@@ -633,7 +799,10 @@
           const isDone = !!progress[e.id];
           if (done === "todo" && isDone) return false;
           if (done === "done" && !isDone) return false;
-          return isRelevant(e);
+          if (onlyFav.checked && !favs[e.id]) return false;
+          if (!matchScene(e)) return false;
+          if (!isRelevant(e)) return false;
+          return true;
         })
         .sort((a, b) => score(b) - score(a));
     }
@@ -641,27 +810,54 @@
     function renderStats(items) {
       const total = items.length;
       const doneCount = items.filter(e => progress[e.id]).length;
+      const favCount = Object.keys(favs).length;
       const pct = total ? Math.round((doneCount / total) * 100) : 0;
       statsEl.innerHTML = `
         <div class="stat-card"><div class="num">${total}</div><div class="label">目前顯示</div></div>
         <div class="stat-card"><div class="num">${doneCount}</div><div class="label">已完成</div></div>
         <div class="stat-card"><div class="num">${pct}%</div><div class="label">完成率</div></div>
-        <div class="stat-card"><div class="num">${Object.keys(progress).length}</div><div class="label">累計打勾</div></div>
+        <div class="stat-card"><div class="num">${favCount}</div><div class="label">收藏</div></div>
       `;
+    }
+
+    function renderChapterStats() {
+      if (!showChStats.checked) {
+        chapterStatsEl.classList.remove("show");
+        return;
+      }
+      const byCh = {};
+      ENTRIES.forEach(e => {
+        if (!byCh[e.chapter]) byCh[e.chapter] = { total: 0, done: 0 };
+        byCh[e.chapter].total++;
+        if (progress[e.id]) byCh[e.chapter].done++;
+      });
+      const rows = Object.entries(byCh)
+        .map(([name, v]) => {
+          const pct = v.total ? Math.round(v.done / v.total * 100) : 0;
+          return `<div class="ch-bar"><span class="name" title="${name}">${name}</span><div class="track"><div class="fill" style="width:${pct}%"></div></div><span class="pct">${pct}%</span></div>`;
+        })
+        .join("");
+      chapterStatsEl.innerHTML = `<h3>各章節完成率</h3>${rows}`;
+      chapterStatsEl.classList.add("show");
     }
 
     function render() {
       renderDaily();
       const items = getFiltered();
       renderStats(items);
+      renderChapterStats();
       listEl.innerHTML = items.map(e => {
         const done = !!progress[e.id];
+        const isFav = !!favs[e.id];
         return `
-          <article class="item ${done ? "done" : ""}" data-id="${e.id}">
+          <article class="item ${done ? "done" : ""} ${isFav ? "fav" : ""}" data-id="${e.id}">
             <div class="item-header">
-              <input type="checkbox" ${done ? "checked" : ""} data-id="${e.id}" />
-              <div>
-                <div class="item-title">${e.title}</div>
+              <input type="checkbox" ${done ? "checked" : ""} data-id="${e.id}" class="done-cb" />
+              <div style="flex:1">
+                <div style="display:flex;align-items:flex-start;gap:6px">
+                  <div class="item-title">${e.title}</div>
+                  <button class="star-btn ${isFav ? "on" : ""}" data-id="${e.id}" title="收藏">★</button>
+                </div>
                 <div class="item-meta">
                   <span class="tag ${e.evidence.toLowerCase()}">證據 ${e.evidence}</span>
                   <span class="tag ${e.money === "0" ? "cost0" : ""}">錢：${e.money === "0" ? "不花" : e.money}</span>
@@ -677,25 +873,57 @@
         `;
       }).join("") || `<p style="color:var(--muted);padding:20px;">沒有符合條件的條目</p>`;
 
-      // checkbox events
-      listEl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      listEl.querySelectorAll(".done-cb").forEach(cb => {
         cb.addEventListener("change", () => {
           const id = cb.dataset.id;
-          if (cb.checked) progress[id] = Date.now();
-          else delete progress[id];
+          if (cb.checked) {
+            progress[id] = Date.now();
+            toast("已完成 ✓");
+          } else delete progress[id];
           saveProgress();
           render();
         });
       });
+      listEl.querySelectorAll(".star-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.id;
+          if (favs[id]) delete favs[id];
+          else favs[id] = Date.now();
+          saveFavs();
+          render();
+        });
+      });
     }
+
+    // scenario buttons
+    document.getElementById("scenarioBar").addEventListener("click", (e) => {
+      const btn = e.target.closest(".scenario-btn");
+      if (!btn) return;
+      document.querySelectorAll(".scenario-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentScene = btn.dataset.scene || "";
+      render();
+    });
+
+    randomBtn.addEventListener("click", () => {
+      const pool = ENTRIES.filter(e => !progress[e.id]);
+      if (!pool.length) { toast("全部完成啦！"); return; }
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      tempDailyId = pick.id;
+      renderDaily();
+      dailyCardEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      toast("已抽一條挑戰");
+    });
 
     searchEl.addEventListener("input", render);
     filterChapter.addEventListener("change", render);
     filterEvidence.addEventListener("change", render);
     filterCost.addEventListener("change", render);
     filterDone.addEventListener("change", render);
+    onlyMine.addEventListener("change", render);
+    onlyFav.addEventListener("change", render);
+    showChStats.addEventListener("change", render);
 
-    // 初始化章節下拉
     populateChapters();
   </script>
 </body>
