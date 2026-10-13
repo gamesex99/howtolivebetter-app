@@ -238,6 +238,7 @@
           </label>
           <button type="button" id="themeBtn">亮色主題</button>
           <button type="button" id="loadFullBtn">載入完整數據</button>
+          <button type="button" id="clearFullBtn">恢復精選（清快取）</button>
           <button type="button" id="exportBtn">匯出進度</button>
           <button type="button" id="importBtn">匯入進度</button>
           <input type="file" id="importFile" accept=".json" class="hidden" />
@@ -469,7 +470,73 @@ const ENTRIES = [
       { id:"33-01", chapter:"33-殘疾之後怎麼活", title:"了解殘疾人證與相關福利政策", say:"符合條件時應申請，這是法定權益。", cost:"辦理時間。", benefit:"獲得應有支持", evidence:"A", money:"0", time:"中", will:"否", stages:["early","mid","senior"], tags:[] }
     ];
 
-    const TRAD_MAP = {"麼":"么","後":"后","來":"来","時":"时","間":"间","為":"为","這":"这","還":"还","過":"过","對":"对","會":"会","說":"说","個":"个","們":"们","從":"从","國":"国","與":"与","無":"无","長":"长","開":"开","關":"关","門":"门","問":"问","題":"题","點":"点","錢":"钱","買":"买","賣":"卖","東":"东","車":"车","電":"电","話":"话","語":"语","讀":"读","寫":"写","聽":"听","見":"见","現":"现","發":"发","經":"经","濟":"济","體":"体","醫":"医","藥":"药","療":"疗","兒":"儿","孫":"孙","學":"学","習":"习","業":"业","職":"职","務":"务","員":"员","機":"机","構":"构","條":"条","據":"据","證":"证","險":"险","餘":"余","產":"产","權":"权","責":"责","義":"义","議":"议","論":"论","認":"认","識":"识","總":"总","結":"结","環":"环","優":"优","勢":"势","損":"损","獲":"获","進":"进","運":"运","動":"动","靜":"静","養":"养","護":"护","顧":"顾","應":"应","該":"该","當":"当","處":"处","辦":"办","規":"规","則":"则","準":"准","備":"备","選":"选","擇":"择","決":"决","計":"计","劃":"划","設":"设","資":"资","訊":"讯","網":"网","絡":"络","聯":"联","繫":"系","統":"统","數":"数","庫":"库","檔":"档","紀":"纪","錄":"录","憶":"忆","懷":"怀","節":"节","頁":"页","瀏":"浏","覽":"览","標":"标","籤":"签","篩":"筛","尋":"寻","匯":"汇","顯":"显","隱":"隐","簡":"简","載":"载","薦":"荐","隨":"随","戰":"战","適":"适","場":"场","財":"财","壽":"寿","風":"风","級":"级","剛":"刚","歲":"岁","術":"术","記":"记","換":"换","沒":"没","況":"况","階":"阶","係":"系","煙":"烟","鹽":"盐","堅":"坚","穀":"谷","擔":"担","轉":"转","嬰":"婴","葉":"叶","書":"书","專":"专","鈉":"钠","飲":"饮","訓":"训","練":"练","續":"续","費":"费","稅":"税","積":"积","虛":"虚","擬":"拟","貨":"货","幣":"币","補":"补","償":"偿","債":"债","騙":"骗","報":"报","帳":"账","戶":"户","滅":"灭","殺":"杀","頭":"头","熱":"热","線":"线","診":"诊","崗":"岗","預":"预","拋":"抛","傷":"伤","鬆":"松","驗":"验","減":"减","擊":"击","殘":"残"};
+
+    // 內建精選備份（載入全量失敗時可還原）
+    const BUILTIN_ENTRIES = ENTRIES.map(e => ({...e}));
+    const FULL_CACHE_KEY = 'htlb_full_entries_v2';
+    const FULL_FLAG_KEY = 'htlb_use_full_v2';
+
+    function idbOpen() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open('htlb_db_v2', 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+    async function idbSet(key, value) {
+      const db = await idbOpen();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('kv', 'readwrite');
+        tx.objectStore('kv').put(value, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+    async function idbGet(key) {
+      const db = await idbOpen();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('kv', 'readonly');
+        const req = tx.objectStore('kv').get(key);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+    async function idbDel(key) {
+      const db = await idbOpen();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('kv', 'readwrite');
+        tx.objectStore('kv').delete(key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function saveFullCache(items) {
+      await idbSet(FULL_CACHE_KEY, items);
+      localStorage.setItem(FULL_FLAG_KEY, '1');
+      localStorage.setItem(FULL_FLAG_KEY + '_n', String(items.length));
+      localStorage.setItem(FULL_FLAG_KEY + '_at', new Date().toISOString());
+    }
+    async function loadFullCache() {
+      if (localStorage.getItem(FULL_FLAG_KEY) !== '1') return null;
+      try {
+        const items = await idbGet(FULL_CACHE_KEY);
+        if (Array.isArray(items) && items.length > 50) return items;
+      } catch (e) { console.warn(e); }
+      return null;
+    }
+    async function clearFullCache() {
+      try { await idbDel(FULL_CACHE_KEY); } catch(e) {}
+      localStorage.removeItem(FULL_FLAG_KEY);
+      localStorage.removeItem(FULL_FLAG_KEY + '_n');
+      localStorage.removeItem(FULL_FLAG_KEY + '_at');
+    }
+
+        const TRAD_MAP = {"麼":"么","後":"后","來":"来","時":"时","間":"间","為":"为","這":"这","還":"还","過":"过","對":"对","會":"会","說":"说","個":"个","們":"们","從":"从","國":"国","與":"与","無":"无","長":"长","開":"开","關":"关","門":"门","問":"问","題":"题","點":"点","錢":"钱","買":"买","賣":"卖","東":"东","車":"车","電":"电","話":"话","語":"语","讀":"读","寫":"写","聽":"听","見":"见","現":"现","發":"发","經":"经","濟":"济","體":"体","醫":"医","藥":"药","療":"疗","兒":"儿","孫":"孙","學":"学","習":"习","業":"业","職":"职","務":"务","員":"员","機":"机","構":"构","條":"条","據":"据","證":"证","險":"险","餘":"余","產":"产","權":"权","責":"责","義":"义","議":"议","論":"论","認":"认","識":"识","總":"总","結":"结","環":"环","優":"优","勢":"势","損":"损","獲":"获","進":"进","運":"运","動":"动","靜":"静","養":"养","護":"护","顧":"顾","應":"应","該":"该","當":"当","處":"处","辦":"办","規":"规","則":"则","準":"准","備":"备","選":"选","擇":"择","決":"决","計":"计","劃":"划","設":"设","資":"资","訊":"讯","網":"网","絡":"络","聯":"联","繫":"系","統":"统","數":"数","庫":"库","檔":"档","紀":"纪","錄":"录","憶":"忆","懷":"怀","節":"节","頁":"页","瀏":"浏","覽":"览","標":"标","籤":"签","篩":"筛","尋":"寻","匯":"汇","顯":"显","隱":"隐","簡":"简","載":"载","薦":"荐","隨":"随","戰":"战","適":"适","場":"场","財":"财","壽":"寿","風":"风","級":"级","剛":"刚","歲":"岁","術":"术","記":"记","換":"换","沒":"没","況":"况","階":"阶","係":"系","煙":"烟","鹽":"盐","堅":"坚","穀":"谷","擔":"担","轉":"转","嬰":"婴","葉":"叶","書":"书","專":"专","鈉":"钠","飲":"饮","訓":"训","練":"练","續":"续","費":"费","稅":"税","積":"积","虛":"虚","擬":"拟","貨":"货","幣":"币","補":"补","償":"偿","債":"债","騙":"骗","報":"报","帳":"账","戶":"户","滅":"灭","殺":"杀","頭":"头","熱":"热","線":"线","診":"诊","崗":"岗","預":"预","拋":"抛","傷":"伤","鬆":"松","驗":"验","減":"减","擊":"击","殘":"残"};
     function toSimp(s) {
       if (!s) return s;
       let out = '';
@@ -631,9 +698,33 @@ const ENTRIES = [
     };
 
     // full dataset
+    function mapDatasetItem(it) {
+      const sec = it.section_title || ("第"+it.section+"节");
+      return {
+        id: String(it.id),
+        chapter: String(it.section).padStart(2,"0")+"-"+sec,
+        title: it.title||"",
+        say: it.plain||"",
+        cost: it.cost_text||"",
+        benefit: it.benefit_text || it.benefit_level || "",
+        evidence: (it.evidence||"C").charAt(0).toUpperCase(),
+        money: (it.cost_money==="0"||it.cost_money===0) ? "0" : (it.cost_money||"少"),
+        time: it.cost_time||"少",
+        will: it.cost_willpower||"否",
+        stages: ["student","early","mid","senior"],
+        tags: []
+      };
+    }
+    function applyEntries(list) {
+      ENTRIES.length = 0;
+      list.forEach(e => ENTRIES.push(e));
+      populateChapters();
+      tempDailyId = null;
+      if (typeof render === "function") render();
+    }
     async function loadFullDataset() {
       const btn = $("loadFullBtn");
-      btn.disabled = true; btn.textContent = t("loading");
+      if (btn) { btn.disabled = true; btn.textContent = t("loading"); }
       try {
         let res = await fetch("https://cdn.jsdelivr.net/gh/sin0317/htlb-dataset@main/data/htlb.json");
         if (!res.ok) res = await fetch("https://raw.githubusercontent.com/sin0317/htlb-dataset/main/data/htlb.json");
@@ -641,34 +732,40 @@ const ENTRIES = [
         const data = await res.json();
         const items = data.items || data;
         if (!Array.isArray(items) || !items.length) throw new Error("empty");
-        ENTRIES.length = 0;
-        items.forEach(it => {
-          const sec = it.section_title || ("第"+it.section+"节");
-          ENTRIES.push({
-            id: String(it.id),
-            chapter: String(it.section).padStart(2,"0")+"-"+sec,
-            title: it.title||"",
-            say: it.plain||"",
-            cost: it.cost_text||"",
-            benefit: it.benefit_text || it.benefit_level || "",
-            evidence: (it.evidence||"C").charAt(0).toUpperCase(),
-            money: (it.cost_money==="0"||it.cost_money===0) ? "0" : (it.cost_money||"少"),
-            time: it.cost_time||"少",
-            will: it.cost_willpower||"否",
-            stages: ["student","early","mid","senior"],
-            tags: []
-          });
-        });
-        populateChapters(); tempDailyId=null; render();
+        const mapped = items.map(mapDatasetItem);
+        applyEntries(mapped);
+        await saveFullCache(mapped);
         toast(t("loadOk")+" ("+ENTRIES.length+")");
       } catch(e) {
         console.error(e); toast(t("loadFail"));
       } finally {
-        btn.disabled=false; applyChrome();
+        if (btn) { btn.disabled=false; }
+        applyChrome();
         menuPanel.classList.remove("open");
       }
     }
     $("loadFullBtn").onclick = loadFullDataset;
+    const clearFullBtn = $("clearFullBtn");
+    if (clearFullBtn) {
+      clearFullBtn.onclick = async () => {
+        await clearFullCache();
+        applyEntries(BUILTIN_ENTRIES.map(e => ({...e})));
+        toast(lang==="en" ? "Back to curated list" : (lang==="zh-Hans" ? "已恢复精选" : "已恢復精選"));
+        applyChrome();
+        menuPanel.classList.remove("open");
+      };
+    }
+
+    // 啟動時：若有本機全量快取，自動使用
+    (async function restoreFullIfCached() {
+      try {
+        const cached = await loadFullCache();
+        if (cached) {
+          applyEntries(cached);
+          console.log("[htlb] restored full cache", cached.length);
+        }
+      } catch (e) { console.warn(e); }
+    })();
 
     function applyChrome() {
       $("appTitle").textContent = t("title");
@@ -676,6 +773,8 @@ const ENTRIES = [
       const isDark = document.body.getAttribute("data-theme")==="dark";
       $("themeBtn").textContent = isDark ? t("theme") : t("themeDark");
       $("loadFullBtn").textContent = t("loadFull");
+      const cfb = $("clearFullBtn");
+      if (cfb) cfb.textContent = lang==="en" ? "Curated only (clear cache)" : (lang==="zh-Hans" ? "恢复精选（清缓存）" : "恢復精選（清快取）");
       $("exportBtn").textContent = t("export");
       $("importBtn").textContent = t("import");
       $("setupTitle").textContent = t("setupTitle");
