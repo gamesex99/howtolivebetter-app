@@ -175,6 +175,43 @@
     .cost-benefit { font-size: 0.85rem; color: #94a3b8; }
     .item-footer { margin-top: 10px; font-size: 0.8rem; color: var(--muted); }
 
+    /* 每日推薦 */
+    .daily-card {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1a2332 100%);
+      border: 1px solid #3b82f6;
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .daily-card .daily-label {
+      font-size: 0.75rem;
+      color: #93c5fd;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+    .daily-card .daily-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .daily-card .daily-say {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+    }
+    .daily-card .daily-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .daily-card .daily-meta {
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
     footer {
       margin-top: 40px;
       padding: 20px 0;
@@ -228,11 +265,17 @@
 
     <!-- 主介面 -->
     <section id="main" class="hidden">
+      <!-- 每日推薦 -->
+      <div id="dailyCard" class="daily-card"></div>
+
       <div class="stats" id="stats"></div>
 
       <div class="toolbar">
         <input type="search" id="search" placeholder="搜尋關鍵字（例如：鹽、睡眠、失業…）" />
         <div class="filters">
+          <select id="filterChapter">
+            <option value="">全部章節</option>
+          </select>
           <select id="filterEvidence">
             <option value="">全部證據</option>
             <option value="A">A 級</option>
@@ -255,6 +298,7 @@
 
       <div class="list" id="list"></div>
     </section>
+
 
     <footer>
       內容改編自 <a href="https://github.com/eternity4719/HowToLiveBetter" target="_blank" rel="noopener">eternity4719/HowToLiveBetter</a>
@@ -348,7 +392,59 @@
       { id:"misc-01", chapter:"02-不要慢慢死", title:"認真刷牙並清潔牙縫", say:"口腔健康與全身炎症、心血管風險有關。", cost:"牙刷牙線成本很低。", benefit:"降低口腔與系統性疾病風險", evidence:"A", money:"少", time:"少", will:"些", stages:["student","early","mid","senior"], tags:[] },
       { id:"misc-02", chapter:"02-不要慢慢死", title:"白天適當曬太陽（注意防曬）", say:"有助於維生素D，但要避免過度暴曬。", cost:"不花錢。", benefit:"骨骼與免疫相關", evidence:"B", money:"0", time:"少", will:"否", stages:["early","mid","senior"], tags:[] },
       { id:"misc-03", chapter:"05-不要浪費錢", title:"大額購買設冷靜期再決定", say:"衝動消費是常見的金錢浪費來源。", cost:"等一兩天。", benefit:"減少後悔消費", evidence:"C", money:"0", time:"少", will:"些", stages:["student","early","mid"], tags:[] },
-      { id:"misc-04", chapter:"08-別把自己搭進去", title:"養犬必須牽繩並盡到管理責任", say:"狗傷人可能承擔民事甚至刑事責任。", cost:"牽繩與管理習慣。", benefit:"避免賠償與法律風險", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid","senior"], tags:[] }
+      { id:"misc-04", chapter:"08-別把自己搭進去", title:"養犬必須牽繩並盡到管理責任", say:"狗傷人可能承擔民事甚至刑事責任。", cost:"牽繩與管理習慣。", benefit:"避免賠償與法律風險", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid","senior"], tags:[] },
+
+      // ===== 補充更多章節 =====
+      { id:"02-11", chapter:"02-不要慢慢死", title:"戒煙先去拿藥，成功率能翻倍", say:"光靠忍多數人戒不掉。伐尼克蘭成功率約是安慰劑的兩倍多。", cost:"一個療程幾百到一千多元，可與省下的煙錢抵消。", benefit:"戒煙成功率大幅提升", evidence:"A", money:"少", time:"少", will:"些", stages:["early","mid","senior"], tags:[] },
+      { id:"02-12", chapter:"02-不要慢慢死", title:"定一個戒煙日，到那天一次停掉", say:"研究顯示一次停掉比慢慢減更有效。", cost:"不花錢。", benefit:"提高戒煙成功率", evidence:"A", money:"0", time:"少", will:"是", stages:["early","mid","senior"], tags:[] },
+      { id:"02-13", chapter:"02-不要慢慢死", title:"不嚼檳榔", say:"檳榔是明確的致癌物，與口腔癌高度相關。", cost:"不花錢。", benefit:"大幅降低口腔癌風險", evidence:"A", money:"0", time:"少", will:"些", stages:["early","mid"], tags:[] },
+      { id:"02-14", chapter:"02-不要慢慢死", title:"紅肉適量，多換成魚和禽肉", say:"高紅肉攝入與多種慢性病風險上升有關。", cost:"可能略貴。", benefit:"降低相關疾病風險", evidence:"A", money:"少", time:"少", will:"些", stages:["early","mid","senior"], tags:[] },
+      { id:"02-15", chapter:"02-不要慢慢死", title:"每天吃夠蔬菜水果（約5份）", say:"蔬果攝入與較低總死亡率相關。", cost:"日常飲食開支。", benefit:"降低多種慢性病風險", evidence:"A", money:"少", time:"少", will:"些", stages:["early","mid","senior"], tags:[] },
+      { id:"02-16", chapter:"02-不要慢慢死", title:"別連著坐太久，每隔一段時間起來動", say:"久坐本身是獨立風險因素。", cost:"不花錢。", benefit:"改善代謝與心血管指標", evidence:"A", money:"0", time:"少", will:"些", stages:["early","mid"], tags:["tech"] },
+      { id:"05-11", chapter:"05-不要浪費錢", title:"拒絕電子產品延保", say:"多數延保性價比很低，原廠保修通常已足夠。", cost:"不買就省。", benefit:"避免無效開支", evidence:"B", money:"0", time:"少", will:"否", stages:["student","early","mid"], tags:[] },
+      { id:"05-12", chapter:"05-不要浪費錢", title:"選費率低的基金，寬基指數基金做底倉", say:"長期來看，費率會顯著侵蝕收益。", cost:"學習與開戶時間。", benefit:"提高長期淨收益", evidence:"A", money:"0", time:"中", will:"些", stages:["early","mid"], tags:[] },
+      { id:"05-13", chapter:"05-不要浪費錢", title:"三者險買夠額度", say:"車險裡三者險是真正轉移大風險的部分。", cost:"保費。", benefit:"避免一次事故導致巨額賠償", evidence:"A", money:"中", time:"少", will:"否", stages:["early","mid"], tags:[] },
+      { id:"05-14", chapter:"05-不要浪費錢", title:"不給主播打賞、不沉迷直播購物", say:"情緒消費容易失控。", cost:"自制力。", benefit:"省下可觀金額", evidence:"C", money:"0", time:"少", will:"是", stages:["student","early"], tags:[] },
+      { id:"08-04", chapter:"08-別把自己搭進去", title:"彩禮與婚前協議要事先溝通清楚", say:"金錢與婚姻糾紛是常見民事爭議來源。", cost:"溝通時間。", benefit:"降低日後糾紛", evidence:"B", money:"0", time:"中", will:"些", stages:["early","mid"], tags:[] },
+      { id:"10-01", chapter:"10-戀愛和結婚划不划算", title:"結婚前認真算清楚健康、金錢與法律賬", say:"結婚是重大人生決策，值得用證據與成本收益思考。", cost:"溝通與可能的諮詢。", benefit:"更清醒的決策", evidence:"B", money:"0", time:"中", will:"些", stages:["early","mid"], tags:[] },
+      { id:"12-01", chapter:"12-創業與做生意", title:"創業前先搞清楚要辦哪些證與合規要求", say:"無證經營可能被查處，損失時間與金錢。", cost:"諮詢與辦理時間。", benefit:"避免合規風險", evidence:"A", money:"少", time:"中", will:"否", stages:["early","mid"], tags:[] },
+      { id:"14-01", chapter:"14-賬號與信息安全", title:"重要賬號開啟兩步驗證", say:"密碼洩露時的最後一道防線。", cost:"設定一次。", benefit:"大幅降低被盜風險", evidence:"A", money:"0", time:"少", will:"否", stages:["student","early","mid","senior"], tags:[] },
+      { id:"14-02", chapter:"14-賬號與信息安全", title:"不要隨意掃描不明二維碼或授權陌生App", say:"常見的詐騙與盜號入口。", cost:"多想一秒。", benefit:"避免賬號與金錢損失", evidence:"A", money:"0", time:"少", will:"否", stages:["student","early","mid","senior"], tags:[] },
+      { id:"17-01", chapter:"17-家裡有老人", title:"家中老人防跌倒（地面防滑、夜間照明）", say:"跌倒是老人傷殘與死亡的重要原因。", cost:"小額改造費用。", benefit:"降低跌倒風險", evidence:"A", money:"少", time:"中", will:"否", stages:["mid","senior"], tags:[] },
+      { id:"18-01", chapter:"18-養孩子划不划算", title:"養孩子前認真估算時間、金錢與機會成本", say:"這是重大長期承諾，值得事先算清楚。", cost:"思考與討論時間。", benefit:"更清醒的決策", evidence:"B", money:"0", time:"中", will:"些", stages:["early","mid"], tags:[] },
+      { id:"21-01", chapter:"21-出國旅行與境外安全", title:"出國前查清目的地安全提示與保險", say:"官方安全提示與旅行保險是低成本高收益措施。", cost:"保險費與查詢時間。", benefit:"降低境外風險", evidence:"A", money:"少", time:"少", will:"否", stages:["student","early","mid"], tags:[] },
+      { id:"24-01", chapter:"24-看病", title:"大病優先三甲或專科，小病可基層", say:"分級診療能節省時間與費用。", cost:"判斷與掛號。", benefit:"提高就診效率", evidence:"B", money:"0", time:"少", will:"否", stages:["early","mid","senior"], tags:[] },
+      { id:"26-01", chapter:"26-做一個網站或平台", title:"做平台前先搞清楚要辦哪些證", say:"無證經營可能被處罰。", cost:"諮詢時間。", benefit:"避免合規風險", evidence:"A", money:"少", time:"中", will:"否", stages:["early","mid"], tags:["tech"] },
+      { id:"27-01", chapter:"27-懷孕和生產", title:"備孕與懷孕期間遵醫囑補充葉酸等", say:"有明確證據支持的預防措施。", cost:"營養補充費用不高。", benefit:"降低出生缺陷風險", evidence:"A", money:"少", time:"少", will:"否", stages:["early","mid"], tags:["pregnant"] },
+      { id:"31-01", chapter:"31-十八歲之後有哪幾條路", title:"十八歲後認真了解升學、就業、技能培訓等路徑", say:"信息差會造成長期機會成本。", cost:"時間。", benefit:"更好的人生路徑選擇", evidence:"B", money:"0", time:"中", will:"些", stages:["student"], tags:[] },
+      { id:"32-01", chapter:"32-出國留學", title:"留學前算清楚總成本與預期回報", say:"學費、生活費、機會成本都要算進去。", cost:"調研時間。", benefit:"更理性的決策", evidence:"B", money:"0", time:"中", will:"些", stages:["student","early"], tags:[] },
+      { id:"34-01", chapter:"34-家裡的常備藥別吃出事", title:"常備藥按說明使用，過期藥及時處理", say:"自行用藥不當可能造成傷害。", cost:"不花錢。", benefit:"避免藥物不良事件", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid","senior"], tags:[] },
+
+      { id:"01-06", chapter:"01-不要早死", title:"家中備滅火器並學會使用", say:"火災黃金逃生時間很短，有滅火器可爭取機會。", cost:"一次性小額開支。", benefit:"降低火災傷亡風險", evidence:"B", money:"少", time:"少", will:"否", stages:["early","mid","senior"], tags:["own_house","rent"] },
+      { id:"01-07", chapter:"01-不要早死", title:"游泳或水上活動必要時穿救生衣", say:"溺水是常見意外死因。", cost:"救生衣費用不高。", benefit:"大幅降低溺水風險", evidence:"A", money:"少", time:"少", will:"否", stages:["student","early","mid"], tags:["has_kids"] },
+      { id:"01-08", chapter:"01-不要早死", title:"有自殺念頭時立刻求助（熱線、急診、身邊人）", say:"危機有時間尺度，及時介入可以救命。", cost:"撥打電話。", benefit:"降低即時風險", evidence:"A", money:"0", time:"少", will:"否", stages:["student","early","mid","senior"], tags:[] },
+      { id:"02-17", chapter:"02-不要慢慢死", title:"BMI 盡量維持在 20–25 左右", say:"過重與過輕都與更高死亡率相關。", cost:"飲食與運動習慣。", benefit:"降低多種慢性病風險", evidence:"A", money:"0", time:"多", will:"是", stages:["early","mid","senior"], tags:[] },
+      { id:"02-18", chapter:"02-不要慢慢死", title:"午睡控制在半小時內", say:"過長午睡可能與不良健康結果相關。", cost:"不花錢。", benefit:"避免午睡過長的負面影響", evidence:"B", money:"0", time:"少", will:"否", stages:["early","mid","senior"], tags:[] },
+      { id:"02-19", chapter:"02-不要慢慢死", title:"上夜班能轉崗就趁早轉", say:"長期夜班與多種健康風險相關。", cost:"可能影響收入或職位。", benefit:"長期健康", evidence:"A", money:"0", time:"中", will:"是", stages:["early","mid"], tags:[] },
+      { id:"03-03", chapter:"03-不要浪費精力", title:"減少多任務切換，盡量專注一件事", say:"頻繁切換會消耗大量認知資源。", cost:"改工作習慣。", benefit:"提高效率與減少疲勞", evidence:"B", money:"0", time:"少", will:"些", stages:["student","early","mid"], tags:["tech"] },
+      { id:"04-03", chapter:"04-不要浪費時間", title:"會議前想清楚有無必要參加", say:"無效會議是常見的時間黑洞。", cost:"需要判斷與偶爾拒絕。", benefit:"取回時間", evidence:"C", money:"0", time:"少", will:"些", stages:["early","mid"], tags:[] },
+      { id:"05-15", chapter:"05-不要浪費錢", title:"預付款務必簽書面合同", say:"口頭約定在糾紛時很難舉證。", cost:"多花時間簽合同。", benefit:"降低預付款損失風險", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid"], tags:[] },
+      { id:"05-16", chapter:"05-不要浪費錢", title:"不頻繁交易股票，減少手續費與情緒決策", say:"頻繁交易往往侵蝕收益。", cost:"改投資習慣。", benefit:"提高長期淨收益", evidence:"A", money:"0", time:"少", will:"是", stages:["early","mid"], tags:[] },
+      { id:"05-17", chapter:"05-不要浪費錢", title:"個人養老金帳戶可考慮（視自身情況）", say:"有稅收優惠，但是否適合要看個人稅率與流動性需求。", cost:"學習與開戶。", benefit:"可能的稅優與長期儲蓄", evidence:"B", money:"0", time:"中", will:"些", stages:["early","mid"], tags:[] },
+      { id:"07-03", chapter:"07-沒錢的時候怎麼活", title:"了解低保、救助站等社會救助渠道", say:"符合條件時應主動申請，這是權利不是施捨。", cost:"諮詢與申請時間。", benefit:"基本生活保障", evidence:"A", money:"0", time:"中", will:"否", stages:["early","mid","senior"], tags:["unemployed"] },
+      { id:"08-05", chapter:"08-別把自己搭進去", title:"交通事故後依法處理，保留證據", say:"保留證據、報警與保險流程很重要。", cost:"時間與程序。", benefit:"保護自身權益", evidence:"A", money:"0", time:"中", will:"否", stages:["early","mid","senior"], tags:[] },
+      { id:"09-03", chapter:"09-普通人容易踩的法律紅線", title:"高空拋物可能承擔刑事責任", say:"即使沒造成重傷，也可能構成犯罪。", cost:"不拋即可。", benefit:"避免刑事風險", evidence:"A", money:"0", time:"少", will:"否", stages:["student","early","mid","senior"], tags:[] },
+      { id:"13-03", chapter:"13-緊急情況", title:"學海姆立克急救法（噎住時）", say:"噎住是可預防的急症，方法簡單有效。", cost:"學一次即可。", benefit:"關鍵時刻可救命", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid","senior"], tags:["has_kids"] },
+      { id:"15-03", chapter:"15-租房與買房", title:"租房合同看清提前解約與押金退還條款", say:"很多糾紛出在合同細節。", cost:"簽約前多讀幾遍。", benefit:"降低押金與違約損失", evidence:"B", money:"0", time:"少", will:"否", stages:["student","early","mid"], tags:["rent"] },
+      { id:"19-03", chapter:"19-在職離職和工傷", title:"工傷認定有時限，受傷後盡快報", say:"超過時限可能影響認定與賠償。", cost:"及時行動。", benefit:"保障工傷待遇", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid"], tags:[] },
+      { id:"20-03", chapter:"20-剛出生的孩子怎麼帶", title:"嬰兒床保持簡單，勿放過多物品", say:"減少窒息與猝死相關風險。", cost:"不花錢。", benefit:"更安全的睡眠環境", evidence:"A", money:"0", time:"少", will:"否", stages:["early","mid"], tags:["has_kids","pregnant"] },
+      { id:"22-01", chapter:"22-怎麼放鬆", title:"用可驗證有效的方式放鬆（運動、社交、睡眠）", say:"真正恢復精力的方式往往成本低。", cost:"習慣調整。", benefit:"更好的精力恢復", evidence:"B", money:"0", time:"中", will:"些", stages:["early","mid"], tags:[] },
+      { id:"23-02", chapter:"23-學什麼技能划算", title:"證書要能在官方渠道查驗", say:"無法查驗的證書價值存疑。", cost:"報名前查清楚。", benefit:"避免無效投入", evidence:"B", money:"0", time:"少", will:"否", stages:["student","early"], tags:[] },
+      { id:"25-01", chapter:"25-人走了以後要辦什麼", title:"提前了解身後事基本流程（戶口、遺產、保險）", say:"家人突然面對時會手足無措。", cost:"花時間了解。", benefit:"減少緊急時的混亂", evidence:"B", money:"0", time:"中", will:"否", stages:["mid","senior"], tags:[] },
+      { id:"28-01", chapter:"28-別為了外形把身體搞壞", title:"減肥與整形前先評估健康風險", say:"極端節食或不正規醫美可能造成長期傷害。", cost:"諮詢正規醫生。", benefit:"避免身體損害", evidence:"A", money:"少", time:"中", will:"些", stages:["student","early","mid"], tags:[] },
+      { id:"29-01", chapter:"29-遭遇重大打擊之後", title:"重大打擊後允許自己求助", say:"孤立會延長恢復時間。", cost:"開口求助的心理成本。", benefit:"加快心理與生活恢復", evidence:"B", money:"0", time:"中", will:"些", stages:["early","mid","senior"], tags:[] },
+      { id:"30-01", chapter:"30-上學以後的孩子", title:"關注孩子睡眠與戶外活動時間", say:"睡眠不足與缺乏運動影響身心發展。", cost:"家庭作息調整。", benefit:"更好的成長基礎", evidence:"A", money:"0", time:"中", will:"些", stages:["mid"], tags:["has_kids"] },
+      { id:"33-01", chapter:"33-殘疾之後怎麼活", title:"了解殘疾人證與相關福利政策", say:"符合條件時應申請，這是法定權益。", cost:"辦理時間。", benefit:"獲得應有支持", evidence:"A", money:"0", time:"中", will:"否", stages:["early","mid","senior"], tags:[] }
     ];
 
     // ========== 狀態 ==========
@@ -367,10 +463,12 @@
     const listEl = document.getElementById("list");
     const statsEl = document.getElementById("stats");
     const searchEl = document.getElementById("search");
+    const filterChapter = document.getElementById("filterChapter");
     const filterEvidence = document.getElementById("filterEvidence");
     const filterCost = document.getElementById("filterCost");
     const filterDone = document.getElementById("filterDone");
     const resetBtn = document.getElementById("resetProfile");
+    const dailyCardEl = document.getElementById("dailyCard");
 
     // chips
     situationsEl.querySelectorAll(".chip").forEach(chip => {
@@ -402,6 +500,7 @@
     function showMain() {
       setupEl.classList.add("hidden");
       mainEl.classList.remove("hidden");
+      populateChapters();
       render();
     }
 
@@ -442,8 +541,84 @@
       return s;
     }
 
+    function populateChapters() {
+      const chapters = [...new Set(ENTRIES.map(e => e.chapter))].sort();
+      filterChapter.innerHTML = '<option value="">全部章節</option>' +
+        chapters.map(c => `<option value="${c}">${c}</option>`).join("");
+    }
+
+    // 每日推薦：用日期做種子，同一天固定一條，優先未完成 + 高性價比
+    function getDailyEntry() {
+      const today = new Date().toISOString().slice(0, 10);
+      const seed = today.split("-").reduce((a, b) => a + parseInt(b, 10), 0);
+      const candidates = ENTRIES
+        .filter(e => !progress[e.id])
+        .sort((a, b) => {
+          const sa = (a.evidence === "A" ? 10 : 0) + (a.money === "0" ? 5 : 0) + score(a);
+          const sb = (b.evidence === "A" ? 10 : 0) + (b.money === "0" ? 5 : 0) + score(b);
+          return sb - sa;
+        });
+      if (!candidates.length) return ENTRIES[seed % ENTRIES.length];
+      return candidates[seed % candidates.length];
+    }
+
+    function renderDaily() {
+      const e = getDailyEntry();
+      if (!e) { dailyCardEl.innerHTML = ""; return; }
+      const done = !!progress[e.id];
+      dailyCardEl.innerHTML = `
+        <div class="daily-label">今日推薦 · ${new Date().toLocaleDateString("zh-HK")}</div>
+        <div class="daily-title">${e.title}</div>
+        <p class="daily-say">${e.say}</p>
+        <div class="daily-actions">
+          <button class="btn btn-sm" id="dailyDoneBtn">${done ? "已完成 ✓" : "標記完成"}</button>
+          <button class="btn btn-secondary btn-sm" id="dailyAnotherBtn">換一條</button>
+          <span class="daily-meta">證據 ${e.evidence} · 錢：${e.money === "0" ? "不花" : e.money} · ${e.chapter}</span>
+        </div>
+      `;
+      document.getElementById("dailyDoneBtn").addEventListener("click", () => {
+        if (progress[e.id]) delete progress[e.id];
+        else progress[e.id] = Date.now();
+        saveProgress();
+        render();
+      });
+      document.getElementById("dailyAnotherBtn").addEventListener("click", () => {
+        // 臨時換一條（不影響「今日」種子，只係即時換）
+        const others = ENTRIES.filter(x => x.id !== e.id && !progress[x.id]);
+        const pick = others[Math.floor(Math.random() * others.length)] || e;
+        dailyCardEl.dataset.tempId = pick.id;
+        renderDailyTemp(pick);
+      });
+    }
+
+    function renderDailyTemp(e) {
+      const done = !!progress[e.id];
+      dailyCardEl.innerHTML = `
+        <div class="daily-label">臨時推薦</div>
+        <div class="daily-title">${e.title}</div>
+        <p class="daily-say">${e.say}</p>
+        <div class="daily-actions">
+          <button class="btn btn-sm" id="dailyDoneBtn">${done ? "已完成 ✓" : "標記完成"}</button>
+          <button class="btn btn-secondary btn-sm" id="dailyAnotherBtn">再換一條</button>
+          <span class="daily-meta">證據 ${e.evidence} · 錢：${e.money === "0" ? "不花" : e.money} · ${e.chapter}</span>
+        </div>
+      `;
+      document.getElementById("dailyDoneBtn").addEventListener("click", () => {
+        if (progress[e.id]) delete progress[e.id];
+        else progress[e.id] = Date.now();
+        saveProgress();
+        render();
+      });
+      document.getElementById("dailyAnotherBtn").addEventListener("click", () => {
+        const others = ENTRIES.filter(x => x.id !== e.id && !progress[x.id]);
+        const pick = others[Math.floor(Math.random() * others.length)] || e;
+        renderDailyTemp(pick);
+      });
+    }
+
     function getFiltered() {
       const q = (searchEl.value || "").trim().toLowerCase();
+      const ch = filterChapter.value;
       const ev = filterEvidence.value;
       const cost = filterCost.value;
       const done = filterDone.value;
@@ -451,6 +626,7 @@
       return ENTRIES
         .filter(e => {
           if (q && !(e.title + e.say + e.chapter).toLowerCase().includes(q)) return false;
+          if (ch && e.chapter !== ch) return false;
           if (ev && e.evidence !== ev) return false;
           if (cost === "0" && e.money !== "0") return false;
           if (cost === "少" && e.money !== "少" && e.money !== "0") return false;
@@ -475,6 +651,7 @@
     }
 
     function render() {
+      renderDaily();
       const items = getFiltered();
       renderStats(items);
       listEl.innerHTML = items.map(e => {
@@ -513,9 +690,13 @@
     }
 
     searchEl.addEventListener("input", render);
+    filterChapter.addEventListener("change", render);
     filterEvidence.addEventListener("change", render);
     filterCost.addEventListener("change", render);
     filterDone.addEventListener("change", render);
+
+    // 初始化章節下拉
+    populateChapters();
   </script>
 </body>
 </html>
