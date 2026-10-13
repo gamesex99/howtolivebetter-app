@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>高性價比人生指南 · 個人行動版</title>
+  <meta name="description" content="基於《高性價比人生指南》的純前端個人進度追蹤與人生階段推薦工具。資料來源：eternity4719/HowToLiveBetter (CC BY 4.0)" />
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --card-hover: #243044;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #8b9bb4;
+      --accent: #3b82f6;
+      --accent2: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    header {
+      padding: 24px 0 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    header h1 { font-size: 1.5rem; font-weight: 700; }
+    header p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #1e3a5f;
+      color: #93c5fd;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* Profile setup */
+    #setup {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    #setup h2 { margin-bottom: 16px; font-size: 1.2rem; }
+    .form-row { margin-bottom: 16px; }
+    .form-row label { display: block; color: var(--muted); font-size: 0.85rem; margin-bottom: 6px; }
+    select, input[type="text"] {
+      width: 100%;
+      max-width: 320px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.15s;
+    }
+    .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+
+    /* Stats bar */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      text-align: center;
+    }
+    .stat-card .num { font-size: 1.6rem; font-weight: 700; color: var(--accent2); }
+    .stat-card .label { font-size: 0.8rem; color: var(--muted); }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+    .toolbar input[type="search"] {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+    }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    /* Cards */
+    .list { display: flex; flex-direction: column; gap: 12px; }
+    .item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      transition: background 0.15s;
+    }
+    .item:hover { background: var(--card-hover); }
+    .item.done { opacity: 0.7; border-color: #166534; }
+    .item-header {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .item-header input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 3px;
+      cursor: pointer;
+      accent-color: var(--accent2);
+    }
+    .item-title { font-weight: 600; font-size: 1.05rem; flex: 1; }
+    .item-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0;
+    }
+    .tag {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #1e293b;
+      color: var(--muted);
+    }
+    .tag.a { background: #14532d; color: #86efac; }
+    .tag.b { background: #713f12; color: #fde68a; }
+    .tag.c { background: #44403c; color: #d6d3d1; }
+    .tag.cost0 { background: #164e63; color: #67e8f9; }
+    .say { color: var(--muted); font-size: 0.95rem; margin: 6px 0; }
+    .cost-benefit { font-size: 0.85rem; color: #94a3b8; }
+    .item-footer { margin-top: 10px; font-size: 0.8rem; color: var(--muted); }
+
+    footer {
+      margin-top: 40px;
+      padding: 20px 0;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    footer a { color: #93c5fd; }
+
+    .hidden { display: none !important; }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.25rem; }
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>高性價比人生指南 <span class="badge">個人行動版</span></h1>
+      <p>按人生階段推薦 · 進度追蹤 · 純前端 · 資料存於本機瀏覽器</p>
+    </header>
+
+    <!-- 初次設定 -->
+    <section id="setup">
+      <h2>先設定你的情況</h2>
+      <div class="form-row">
+        <label>人生階段</label>
+        <select id="stage">
+          <option value="student">高中 / 大學生</option>
+          <option value="early">剛工作（約 22–30 歲）</option>
+          <option value="mid" selected>中年（約 30–50 歲）</option>
+          <option value="senior">50 歲以上 / 退休前後</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>個人情況（可多選）</label>
+        <div class="chips" id="situations">
+          <button type="button" class="chip" data-val="has_kids">有小孩</button>
+          <button type="button" class="chip" data-val="pregnant">懷孕 / 備孕</button>
+          <button type="button" class="chip" data-val="chronic">有慢性病</button>
+          <button type="button" class="chip" data-val="unemployed">失業 / 求職中</button>
+          <button type="button" class="chip" data-val="rent">租房</button>
+          <button type="button" class="chip" data-val="own_house">已買房</button>
+          <button type="button" class="chip" data-val="tech">做技術 / 程式相關</button>
+        </div>
+      </div>
+      <button class="btn" id="startBtn">開始使用</button>
+    </section>
+
+    <!-- 主介面 -->
+    <section id="main" class="hidden">
+      <div class="stats" id="stats"></div>
+
+      <div class="toolbar">
+        <input type="search" id="search" placeholder="搜尋關鍵字（例如：鹽、睡眠、失業…）" />
+        <div class="filters">
+          <select id="filterEvidence">
+            <option value="">全部證據</option>
+            <option value="A">A 級</option>
+            <option value="B">B 級</option>
+            <option value="C">C 級</option>
+          </select>
+          <select id="filterCost">
+            <option value="">全部成本</option>
+            <option value="0">不花錢</option>
+            <option value="少">少錢</option>
+          </select>
+          <select id="filterDone">
+            <option value="">全部</option>
+            <option value="todo">未完成</option>
+            <option value="done">已完成</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" id="resetProfile">重設個人資料</button>
+        </div>
+      </div>
+
+      <div class="list" id="list"></div>
+    </section>
+
+    <footer>
+      內容改編自 <a href="https://github.com/eternity4719/HowToLiveBetter" target="_blank" rel="noopener">eternity4719/HowToLiveBetter</a>
+      《高性價比人生指南》（CC BY 4.0）。<br>
+      本工具為非官方衍生作品，進度資料只存於你本機瀏覽器，不會上傳。<br>
+      健康與法律建議請以醫生、律師及官方最新規定為準。
+    </footer>
+  </div>
+
+  <script>
+    // ========== 精選真實條目（可之後自行擴充） ==========
+    const ENTRIES = [
+      {
+        id: "02-22",
+        chapter: "02-不要慢慢死",
+        title: "每天吃一小把堅果",
+        say: "常吃堅果的人，同期死亡的概率比不吃的人低約兩成。一周吃一次就能看出差別。",
+        cost: "每天 28 克，一年約兩三百元。順手就吃。",
+        benefit: "總死亡率降低約 20%（每周 7 次以上）",
+        evidence: "A",
+        money: "少",
+        time: "少",
+        will: "否",
+        stages: ["early", "mid", "senior"],
+        tags: []
+      },
+      {
+        id: "02-low-sodium",
+        chapter: "02-不要慢慢死",
+        title: "把家裡的食鹽換成低鈉鹽（鉀鹽）",
+        say: "兩萬人的隨機試驗裡，換成低鈉鹽的人五年內死亡概率低約 12%，中風低約 14%。",
+        cost: "每袋貴幾元，買的時候順手換。",
+        benefit: "總死亡率 ↓12%，中風 ↓14%",
+        evidence: "A",
+        money: "少",
+        time: "少",
+        will: "否",
+        stages: ["early", "mid", "senior"],
+        tags: []
+      },
+      {
+        id: "01-smoke",
+        chapter: "01-不要早死",
+        title: "戒煙（或從不開始抽）",
+        say: "戒煙是性價比極高的長壽行為。越早戒，收益越大。",
+        cost: "戒煙藥或門診有成本，但長期省煙錢。",
+        benefit: "大幅降低肺癌、心血管病與總死亡率",
+        evidence: "A",
+        money: "少",
+        time: "中",
+        will: "是",
+        stages: ["early", "mid", "senior"],
+        tags: []
+      },
+      {
+        id: "03-sleep",
+        chapter: "03-不要浪費精力",
+        title: "固定睡眠時間，優先保證 7 小時以上",
+        say: "睡眠不足會直接影響判斷力、情緒和長期健康。",
+        cost: "不花錢，但要改作息。",
+        benefit: "精力與長期健康",
+        evidence: "A",
+        money: "0",
+        time: "少",
+        will: "些",
+        stages: ["student", "early", "mid", "senior"],
+        tags: []
+      },
+      {
+        id: "05-auto-renew",
+        chapter: "05-不要浪費錢",
+        title: "關掉所有自動續費，改為到期手動續",
+        say: "很多人忘記取消訂閱，長期默默扣款。",
+        cost: "一次花 10–20 分鐘檢查。",
+        benefit: "直接省錢",
+        evidence: "C",
+        money: "0",
+        time: "少",
+        will: "否",
+        stages: ["student", "early", "mid", "senior"],
+        tags: []
+      },
+      {
+        id: "05-phone-plan",
+        chapter: "05-不要浪費錢",
+        title: "重算手機與寬頻套餐",
+        say: "很多舊套餐其實可以更便宜。",
+        cost: "一次比較與辦理時間。",
+        benefit: "每月固定省錢",
+        evidence: "C",
+        money: "0",
+        time: "中",
+        will: "否",
+        stages: ["student", "early", "mid"],
+        tags: []
+      },
+      {
+        id: "07-unemploy",
+        chapter: "07-沒錢的時候怎麼活",
+        title: "失業後先申請失業保險金",
+        say: "符合條件就去申請，別因為覺得麻煩而放棄。",
+        cost: "時間成本。",
+        benefit: "現金流緩衝",
+        evidence: "A",
+        money: "0",
+        time: "中",
+        will: "否",
+        stages: ["early", "mid"],
+        tags: ["unemployed"]
+      },
+      {
+        id: "08-guarantee",
+        chapter: "08-別把自己搭進去",
+        title: "原則上不要替人擔保（尤其是大額）",
+        say: "擔保出問題時，法律上你可能要直接還錢。",
+        cost: "拒絕的社交成本。",
+        benefit: "避免巨大財務風險",
+        evidence: "A",
+        money: "0",
+        time: "少",
+        will: "些",
+        stages: ["early", "mid", "senior"],
+        tags: []
+      },
+      {
+        id: "09-rumor",
+        chapter: "09-普通人容易踩的法律紅線",
+        title: "不要轉發未核實的負面訊息（尤其是涉及具體人或單位）",
+        say: "可能構成誹謗或相關法律風險。",
+        cost: "不花錢。",
+        benefit: "降低法律風險",
+        evidence: "A",
+        money: "0",
+        time: "少",
+        will: "否",
+        stages: ["student", "early", "mid", "senior"],
+        tags: []
+      },
+      {
+        id: "13-firstaid",
+        chapter: "13-緊急情況",
+        title: "學基本急救（止血、海姆立克、CPR 意識）",
+        say: "關鍵時刻可能救自己或身邊人。",
+        cost: "課程時間與少量費用。",
+        benefit: "緊急情況下的生存機會",
+        evidence: "A",
+        money: "少",
+        time: "中",
+        will: "些",
+        stages: ["early", "mid", "senior"],
+        tags: ["has_kids"]
+      },
+      {
+        id: "15-deposit",
+        chapter: "15-租房與買房",
+        title: "租房時仔細核對押金條款與房屋產權",
+        say: "避免押金糾紛與被騙。",
+        cost: "簽約前多花時間檢查。",
+        benefit: "降低金錢損失風險",
+        evidence: "B",
+        money: "0",
+        time: "中",
+        will: "否",
+        stages: ["student", "early", "mid"],
+        tags: ["rent"]
+      },
+      {
+        id: "16-chronic",
+        chapter: "16-得了慢性病之後怎麼活",
+        title: "確診慢性病後，先搞清楚正規治療路徑與複診節奏",
+        say: "不要只靠網絡偏方。",
+        cost: "時間與正規醫療費用。",
+        benefit: "長期健康管理",
+        evidence: "A",
+        money: "中",
+        time: "中",
+        will: "些",
+        stages: ["mid", "senior"],
+        tags: ["chronic"]
+      },
+      {
+        id: "19-layoff",
+        chapter: "19-在職離職和工傷",
+        title: "被裁時先算清 N（經濟補償）",
+        say: "每滿一年一個月工資，不滿半年按半個月，滿半年按一年算。",
+        cost: "計算與溝通時間。",
+        benefit: "依法拿到應有補償",
+        evidence: "A",
+        money: "0",
+        time: "中",
+        will: "否",
+        stages: ["early", "mid"],
+        tags: ["unemployed"]
+      },
+      {
+        id: "20-baby-sleep",
+        chapter: "20-剛出生的孩子怎麼帶",
+        title: "嬰兒仰睡，減少猝死風險",
+        say: "這是有明確證據的安全睡眠建議。",
+        cost: "不花錢。",
+        benefit: "降低嬰兒猝死風險",
+        evidence: "A",
+        money: "0",
+        time: "少",
+        will: "否",
+        stages: ["early", "mid"],
+        tags: ["has_kids", "pregnant"]
+      },
+      {
+        id: "23-skill",
+        chapter: "23-學什麼技能划算",
+        title: "優先學可驗證、有市場需求的技能",
+        say: "證書要能查、技能要能演示。",
+        cost: "時間與課程費用。",
+        benefit: "提高就業與議價能力",
+        evidence: "B",
+        money: "中",
+        time: "多",
+        will: "是",
+        stages: ["student", "early"],
+        tags: []
+      },
+      {
+        id: "11-tech-line",
+        chapter: "11-程序員和技術人容易踩的紅線",
+        title: "接私活或做平台前，先搞清楚合規與合同風險",
+        say: "技術人常忽略法律與資質問題。",
+        cost: "諮詢與學習時間。",
+        benefit: "避免法律與金錢風險",
+        evidence: "B",
+        money: "少",
+        time: "中",
+        will: "否",
+        stages: ["early", "mid"],
+        tags: ["tech"]
+      },
+      {
+        id: "04-commute",
+        chapter: "04-不要浪費時間",
+        title: "認真算通勤的時間成本",
+        say: "每天兩小時通勤，一年就是很大一筆時間。",
+        cost: "思考與可能換工作的成本。",
+        benefit: "取回大量可支配時間",
+        evidence: "B",
+        money: "0",
+        time: "少",
+        will: "些",
+        stages: ["early", "mid"],
+        tags: []
+      },
+      {
+        id: "01-gas",
+        chapter: "01-不要早死",
+        title: "注意燃氣安全（定期檢查、安裝報警器）",
+        say: "燃氣事故後果極嚴重，預防成本很低。",
+        cost: "報警器與檢查費用不高。",
+        benefit: "大幅降低致命風險",
+        evidence: "A",
+        money: "少",
+        time: "少",
+        will: "否",
+        stages: ["early", "mid", "senior"],
+        tags: ["own_house", "rent"]
+      }
+    ];
+
+    // ========== 狀態 ==========
+    const STORAGE_KEY = "htlb_progress_v1";
+    const PROFILE_KEY = "htlb_profile_v1";
+
+    let profile = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
+    let progress = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+    // ========== DOM ==========
+    const setupEl = document.getElementById("setup");
+    const mainEl = document.getElementById("main");
+    const stageSel = document.getElementById("stage");
+    const situationsEl = document.getElementById("situations");
+    const startBtn = document.getElementById("startBtn");
+    const listEl = document.getElementById("list");
+    const statsEl = document.getElementById("stats");
+    const searchEl = document.getElementById("search");
+    const filterEvidence = document.getElementById("filterEvidence");
+    const filterCost = document.getElementById("filterCost");
+    const filterDone = document.getElementById("filterDone");
+    const resetBtn = document.getElementById("resetProfile");
+
+    // chips
+    situationsEl.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => chip.classList.toggle("active"));
+    });
+
+    function getSelectedSituations() {
+      return [...situationsEl.querySelectorAll(".chip.active")].map(c => c.dataset.val);
+    }
+
+    startBtn.addEventListener("click", () => {
+      profile = {
+        stage: stageSel.value,
+        situations: getSelectedSituations()
+      };
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+      showMain();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      if (confirm("確定重設個人資料？（進度會保留）")) {
+        localStorage.removeItem(PROFILE_KEY);
+        profile = null;
+        setupEl.classList.remove("hidden");
+        mainEl.classList.add("hidden");
+      }
+    });
+
+    function showMain() {
+      setupEl.classList.add("hidden");
+      mainEl.classList.remove("hidden");
+      render();
+    }
+
+    // 如果已有 profile，直接進入
+    if (profile) {
+      stageSel.value = profile.stage || "mid";
+      (profile.situations || []).forEach(s => {
+        const chip = situationsEl.querySelector(`[data-val="${s}"]`);
+        if (chip) chip.classList.add("active");
+      });
+      showMain();
+    }
+
+    function saveProgress() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    }
+
+    function isRelevant(entry) {
+      if (!profile) return true;
+      // 階段匹配
+      if (entry.stages && entry.stages.length && !entry.stages.includes(profile.stage)) {
+        // 仍然顯示，但權重較低（這裡先全部顯示，之後可改成優先）
+      }
+      // 有 tags 的條目：如果用戶有對應情況就優先，沒有也不隱藏
+      return true;
+    }
+
+    function score(entry) {
+      let s = 0;
+      if (profile && entry.stages && entry.stages.includes(profile.stage)) s += 10;
+      if (profile && entry.tags) {
+        entry.tags.forEach(t => {
+          if ((profile.situations || []).includes(t)) s += 20;
+        });
+      }
+      if (entry.evidence === "A") s += 5;
+      if (entry.money === "0") s += 3;
+      return s;
+    }
+
+    function getFiltered() {
+      const q = (searchEl.value || "").trim().toLowerCase();
+      const ev = filterEvidence.value;
+      const cost = filterCost.value;
+      const done = filterDone.value;
+
+      return ENTRIES
+        .filter(e => {
+          if (q && !(e.title + e.say + e.chapter).toLowerCase().includes(q)) return false;
+          if (ev && e.evidence !== ev) return false;
+          if (cost === "0" && e.money !== "0") return false;
+          if (cost === "少" && e.money !== "少" && e.money !== "0") return false;
+          const isDone = !!progress[e.id];
+          if (done === "todo" && isDone) return false;
+          if (done === "done" && !isDone) return false;
+          return isRelevant(e);
+        })
+        .sort((a, b) => score(b) - score(a));
+    }
+
+    function renderStats(items) {
+      const total = items.length;
+      const doneCount = items.filter(e => progress[e.id]).length;
+      const pct = total ? Math.round((doneCount / total) * 100) : 0;
+      statsEl.innerHTML = `
+        <div class="stat-card"><div class="num">${total}</div><div class="label">目前顯示</div></div>
+        <div class="stat-card"><div class="num">${doneCount}</div><div class="label">已完成</div></div>
+        <div class="stat-card"><div class="num">${pct}%</div><div class="label">完成率</div></div>
+        <div class="stat-card"><div class="num">${Object.keys(progress).length}</div><div class="label">累計打勾</div></div>
+      `;
+    }
+
+    function render() {
+      const items = getFiltered();
+      renderStats(items);
+      listEl.innerHTML = items.map(e => {
+        const done = !!progress[e.id];
+        return `
+          <article class="item ${done ? "done" : ""}" data-id="${e.id}">
+            <div class="item-header">
+              <input type="checkbox" ${done ? "checked" : ""} data-id="${e.id}" />
+              <div>
+                <div class="item-title">${e.title}</div>
+                <div class="item-meta">
+                  <span class="tag ${e.evidence.toLowerCase()}">證據 ${e.evidence}</span>
+                  <span class="tag ${e.money === "0" ? "cost0" : ""}">錢：${e.money === "0" ? "不花" : e.money}</span>
+                  <span class="tag">時間：${e.time}</span>
+                  <span class="tag">毅力：${e.will}</span>
+                  <span class="tag">${e.chapter}</span>
+                </div>
+                <p class="say">${e.say}</p>
+                <p class="cost-benefit"><strong>成本：</strong>${e.cost}　<strong>收益：</strong>${e.benefit}</p>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("") || `<p style="color:var(--muted);padding:20px;">沒有符合條件的條目</p>`;
+
+      // checkbox events
+      listEl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener("change", () => {
+          const id = cb.dataset.id;
+          if (cb.checked) progress[id] = Date.now();
+          else delete progress[id];
+          saveProgress();
+          render();
+        });
+      });
+    }
+
+    searchEl.addEventListener("input", render);
+    filterEvidence.addEventListener("change", render);
+    filterCost.addEventListener("change", render);
+    filterDone.addEventListener("change", render);
+  </script>
+</body>
+</html>
