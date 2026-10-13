@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>高性價比人生指南 · 個人行動版</title>
   <meta name="description" content="基於《高性價比人生指南》的純前端個人進度追蹤與人生階段推薦工具。資料來源：eternity4719/HowToLiveBetter (CC BY 4.0)" />
+  <meta name="theme-color" content="#0f1419" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
   <style>
     :root, [data-theme="dark"] {
       --bg: #0f1419;
@@ -315,9 +320,15 @@
         <p>人生階段推薦 · 進度追蹤 · 收藏 · 每日推薦 · 純前端</p>
       </div>
       <div class="header-actions">
-        <button class="btn btn-secondary btn-sm" id="themeBtn">亮色</button>
-        <button class="btn btn-secondary btn-sm" id="exportBtn">匯出進度</button>
-        <button class="btn btn-secondary btn-sm" id="importBtn">匯入進度</button>
+        <select id="langSel" style="width:auto;max-width:none;padding:6px 10px;font-size:0.82rem">
+          <option value="zh-Hant">繁中</option>
+          <option value="zh-Hans">简中</option>
+          <option value="en">EN</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" id="themeBtn" data-i18n="theme">亮色</button>
+        <button class="btn btn-secondary btn-sm" id="loadFullBtn" data-i18n="loadFull">載入完整數據</button>
+        <button class="btn btn-secondary btn-sm" id="exportBtn" data-i18n="export">匯出進度</button>
+        <button class="btn btn-secondary btn-sm" id="importBtn" data-i18n="import">匯入進度</button>
         <input type="file" id="importFile" accept=".json" class="hidden" />
       </div>
     </header>
@@ -923,6 +934,204 @@ const ENTRIES = [
     onlyMine.addEventListener("change", render);
     onlyFav.addEventListener("change", render);
     showChStats.addEventListener("change", render);
+
+
+    // ===== 11. i18n =====
+    const I18N = {
+      "zh-Hant": {
+        theme: "亮色", themeDark: "暗色", export: "匯出進度", import: "匯入進度",
+        loadFull: "載入完整數據", loading: "載入中…", loadOk: "已載入完整數據",
+        loadFail: "載入失敗，請稍後再試", onlyMine: "只睇適合我", onlyFav: "只睇收藏",
+        showCh: "顯示章節完成率", random: "隨機挑戰", reset: "重設個人資料",
+        start: "開始使用", setupTitle: "先設定你的情況", stageLabel: "人生階段",
+        sitLabel: "個人情況（可多選）", dailyLabel: "今日推薦", done: "標記完成",
+        doneYes: "已完成 ✓", swap: "換一條", searchPh: "搜尋關鍵字…",
+        allCh: "全部章節", allEv: "全部證據", allCost: "全部成本", noMoney: "不花錢",
+        littleMoney: "少錢", all: "全部", todo: "未完成", doneFilter: "已完成",
+        fav: "收藏", shown: "目前顯示", completed: "已完成", rate: "完成率",
+        chapterRate: "各章節完成率", noItems: "沒有符合條件的條目",
+        exported: "已匯出進度", imported: "已匯入進度", challenge: "已抽一條挑戰",
+        allDone: "全部完成啦！", scenes: {"":"全部","layoff":"被裁之後","money":"省錢理財","health":"健康長壽","legal":"法律風險","family":"家庭育兒","career":"工作技能"}
+      },
+      "zh-Hans": {
+        theme: "亮色", themeDark: "暗色", export: "导出进度", import: "导入进度",
+        loadFull: "加载完整数据", loading: "加载中…", loadOk: "已加载完整数据",
+        loadFail: "加载失败，请稍后再试", onlyMine: "只看适合我", onlyFav: "只看收藏",
+        showCh: "显示章节完成率", random: "随机挑战", reset: "重设个人资料",
+        start: "开始使用", setupTitle: "先设定你的情况", stageLabel: "人生阶段",
+        sitLabel: "个人情况（可多选）", dailyLabel: "今日推荐", done: "标记完成",
+        doneYes: "已完成 ✓", swap: "换一条", searchPh: "搜索关键词…",
+        allCh: "全部章节", allEv: "全部证据", allCost: "全部成本", noMoney: "不花钱",
+        littleMoney: "少钱", all: "全部", todo: "未完成", doneFilter: "已完成",
+        fav: "收藏", shown: "目前显示", completed: "已完成", rate: "完成率",
+        chapterRate: "各章节完成率", noItems: "没有符合条件的条目",
+        exported: "已导出进度", imported: "已导入进度", challenge: "已抽一条挑战",
+        allDone: "全部完成啦！", scenes: {"":"全部","layoff":"被裁之后","money":"省钱理财","health":"健康长寿","legal":"法律风险","family":"家庭育儿","career":"工作技能"}
+      },
+      en: {
+        theme: "Light", themeDark: "Dark", export: "Export", import: "Import",
+        loadFull: "Load full dataset", loading: "Loading…", loadOk: "Full dataset loaded",
+        loadFail: "Load failed, try again later", onlyMine: "Only for me", onlyFav: "Favorites only",
+        showCh: "Chapter progress", random: "Random challenge", reset: "Reset profile",
+        start: "Start", setupTitle: "Set your profile", stageLabel: "Life stage",
+        sitLabel: "Situation (multi-select)", dailyLabel: "Today's pick", done: "Mark done",
+        doneYes: "Done ✓", swap: "Another", searchPh: "Search…",
+        allCh: "All chapters", allEv: "All evidence", allCost: "All costs", noMoney: "Free",
+        littleMoney: "Cheap", all: "All", todo: "Todo", doneFilter: "Done",
+        fav: "Favorites", shown: "Shown", completed: "Done", rate: "Rate",
+        chapterRate: "Progress by chapter", noItems: "No matching items",
+        exported: "Exported", imported: "Imported", challenge: "New challenge",
+        allDone: "All done!", scenes: {"":"All","layoff":"After layoff","money":"Save money","health":"Health","legal":"Legal risks","family":"Family","career":"Career"}
+      }
+    };
+    let lang = localStorage.getItem("htlb_lang_v1") || "zh-Hant";
+    const langSel = document.getElementById("langSel");
+    if (langSel) langSel.value = lang;
+
+    function t(key) {
+      const pack = I18N[lang] || I18N["zh-Hant"];
+      return pack[key] != null ? pack[key] : key;
+    }
+    function applyI18n() {
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const k = el.getAttribute("data-i18n");
+        if (k === "theme") {
+          const isDark = document.body.getAttribute("data-theme") === "dark";
+          el.textContent = isDark ? t("theme") : t("themeDark");
+        } else {
+          el.textContent = t(k);
+        }
+      });
+      const search = document.getElementById("search");
+      if (search) search.placeholder = t("searchPh");
+      // scenario buttons
+      document.querySelectorAll(".scenario-btn").forEach(btn => {
+        const sc = btn.dataset.scene || "";
+        const scenes = (I18N[lang] || I18N["zh-Hant"]).scenes || {};
+        if (scenes[sc] != null) btn.textContent = scenes[sc];
+      });
+      const startBtnEl = document.getElementById("startBtn");
+      if (startBtnEl) startBtnEl.textContent = t("start");
+      const resetBtnEl = document.getElementById("resetProfile");
+      if (resetBtnEl) resetBtnEl.textContent = t("reset");
+      // redo toggles cleanly with current i18n labels
+      const row = document.querySelector(".toggle-row");
+      if (row) {
+        const onlyMineCb = document.getElementById("onlyMine");
+        const onlyFavCb = document.getElementById("onlyFav");
+        const showChCb = document.getElementById("showChStats");
+        const om = onlyMineCb ? onlyMineCb.checked : false;
+        const of = onlyFavCb ? onlyFavCb.checked : false;
+        const sc = showChCb ? showChCb.checked : false;
+        row.innerHTML = `
+          <label class="toggle"><input type="checkbox" id="onlyMine" ${om?"checked":""}/> ${t("onlyMine")}</label>
+          <label class="toggle"><input type="checkbox" id="onlyFav" ${of?"checked":""}/> ${t("onlyFav")}</label>
+          <label class="toggle"><input type="checkbox" id="showChStats" ${sc?"checked":""}/> ${t("showCh")}</label>
+          <button class="btn btn-secondary btn-sm" id="randomBtn">${t("random")}</button>
+        `;
+        document.getElementById("onlyMine").addEventListener("change", render);
+        document.getElementById("onlyFav").addEventListener("change", render);
+        document.getElementById("showChStats").addEventListener("change", render);
+        document.getElementById("randomBtn").addEventListener("click", () => {
+          const pool = ENTRIES.filter(e => !progress[e.id]);
+          if (!pool.length) { toast(t("allDone")); return; }
+          const pick = pool[Math.floor(Math.random() * pool.length)];
+          tempDailyId = pick.id;
+          renderDaily();
+          dailyCardEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          toast(t("challenge"));
+        });
+      }
+      // filter option texts
+      const fe = document.getElementById("filterEvidence");
+      if (fe) {
+        fe.options[0].text = t("allEv");
+      }
+      const fc = document.getElementById("filterCost");
+      if (fc) {
+        fc.options[0].text = t("allCost");
+        if (fc.options[1]) fc.options[1].text = t("noMoney");
+        if (fc.options[2]) fc.options[2].text = t("littleMoney");
+      }
+      const fd = document.getElementById("filterDone");
+      if (fd) {
+        fd.options[0].text = t("all");
+        if (fd.options[1]) fd.options[1].text = t("todo");
+        if (fd.options[2]) fd.options[2].text = t("doneFilter");
+      }
+      render();
+    }
+    if (langSel) {
+      langSel.addEventListener("change", () => {
+        lang = langSel.value;
+        localStorage.setItem("htlb_lang_v1", lang);
+        applyI18n();
+      });
+    }
+
+    // ===== 9. Load full dataset from htlb-dataset =====
+    const FULL_URL = "https://cdn.jsdelivr.net/gh/sin0317/htlb-dataset@main/data/htlb.json";
+    const FULL_URL_FALLBACK = "https://raw.githubusercontent.com/sin0317/htlb-dataset/main/data/htlb.json";
+    let ENTRIES_BASE = ENTRIES.slice();
+
+    function mapDatasetItem(it) {
+      const sec = it.section_title || ("第" + it.section + "节");
+      const chapter = String(it.section).padStart(2, "0") + "-" + sec;
+      return {
+        id: String(it.id),
+        chapter: chapter,
+        title: it.title || "",
+        say: it.plain || "",
+        cost: it.cost_text || "",
+        benefit: it.benefit_text || (it.benefit_level || ""),
+        evidence: (it.evidence || "C").charAt(0).toUpperCase(),
+        money: it.cost_money === "0" || it.cost_money === 0 ? "0" : (it.cost_money || "少"),
+        time: it.cost_time || "少",
+        will: it.cost_willpower || "否",
+        stages: ["student","early","mid","senior"],
+        tags: []
+      };
+    }
+
+    async function loadFullDataset() {
+      const btn = document.getElementById("loadFullBtn");
+      if (btn) { btn.disabled = true; btn.textContent = t("loading"); }
+      try {
+        let res = await fetch(FULL_URL);
+        if (!res.ok) res = await fetch(FULL_URL_FALLBACK);
+        if (!res.ok) throw new Error("http " + res.status);
+        const data = await res.json();
+        const items = data.items || data;
+        if (!Array.isArray(items) || !items.length) throw new Error("empty");
+        ENTRIES.length = 0;
+        items.forEach(it => ENTRIES.push(mapDatasetItem(it)));
+        populateChapters();
+        tempDailyId = null;
+        render();
+        toast(t("loadOk") + " (" + ENTRIES.length + ")");
+        try { localStorage.setItem("htlb_full_loaded_v1", "1"); } catch(e) {}
+      } catch (err) {
+        console.error(err);
+        toast(t("loadFail"));
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = t("loadFull"); }
+      }
+    }
+    const loadFullBtn = document.getElementById("loadFullBtn");
+    if (loadFullBtn) loadFullBtn.addEventListener("click", loadFullDataset);
+
+    // ===== 10. PWA service worker =====
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+
+    // patch toast/export messages to use i18n when possible
+    const _toast = toast;
+    // leave as is; applyI18n will refresh labels
+
+    applyI18n();
 
     populateChapters();
   </script>
